@@ -1,0 +1,88 @@
+{
+  "mode": "test",
+  "event": "order.success",
+  "order": {
+    "id": "20283766",
+    "tax": "null",
+    "date": "2024-02-07 18:22:01",
+    "total": "2800",
+    "charges": [
+      {
+        "name": "The Imposter's Frontend Accelerator",
+        "type": "single",
+        "defer": "false",
+        "label": "accelerator",
+        "amount": "2800",
+        "quantity": "1",
+        "tax_paid": "0",
+        "item_type": "product",
+        "reference": "44",
+        "amount_str": "28.00",
+        "unit_price": "2800",
+        "amount_gross": "2800",
+        "tax_paid_str": "0.00",
+        "unit_price_str": "28.00",
+        "item_identifier": "product_44",
+        "original_amount": "2800",
+        "payment_plan_id": "77483",
+        "amount_gross_str": "28.00",
+        "payment_plan_name": "One-time payment ($28)",
+        "original_amount_str": "28.00"
+      }
+    ],
+    "date_unix": "1686162121",
+    "processor": "stripe",
+    "total_str": "28.00",
+    "invoice_id": "000010072",
+    "total_gross": "2800",
+    "tracking_id": "null",
+    "date_iso8601": "2023-06-07T18:22:01+00:00",
+    "future_charges": [],
+    "total_gross_str": "28.00"
+  },
+  "currency": "USD",
+  "customer": {
+    "id": "429583657671852158",
+    "name": "Joy Bubble",
+    "email": "robconery@gmail.com",
+    "origin": "vanity",
+    "address": {
+      "zip": "94939",
+      "state": "CA",
+      "country": "US"
+    },
+    "last_name": "Bubble",
+    "first_name": "Joy",
+    "ip_address": "98.45.172.114",
+    "client_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0",
+    "checkbox_confirmation": "true"
+  },
+  "mode_int": "1",
+  "order_id": "TEST",
+  "affiliate": "null",
+  "purchases": ["The Imposter's Frontend Accelerator"],
+  "invoice_id": "000010072",
+  "order_date": "2023-06-07 18:22:01",
+  "customer_id": "429583657671852158",
+  "fulfillment": {
+    "url": "https://sales.bigmachine.io/accelerator/confirm/f6003d8a30b1320df299cd653a864ac0a4147391aff5/"
+  },
+  "base_product": "44",
+  "purchase_map": ["product-44"],
+  "transactions": {
+    "product-44": "ch_3NGQzWB2fefm2SmR1TpjPd79"
+  },
+  "subscriptions": [],
+  "order_timestamp": "1686162121",
+  "subscription_ids": [],
+  "base_product_name": "The Imposter's Frontend Accelerator",
+  "purchase_map_flat": "product-44",
+  "thrivecart_secret": "KTNEE4XHP69Y",
+  "base_product_label": "accelerator",
+  "base_product_owner": "5414",
+  "thrivecart_account": "bigmachine",
+  "customer_identifier": "cus_O2W1GjIBvLycUp",
+  "accessible_purchases": ["The Imposter's Frontend Accelerator"],
+  "accessible_purchase_map": ["product-44"],
+  "accessible_purchase_map_flat": "product-44"
+}

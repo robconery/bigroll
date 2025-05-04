@@ -1,0 +1,267 @@
+body {
+  --font-family: -apple-system, BlinkMacSystemFont, Aptos, Roboto, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  line-height: 1.6;
+  font-size: 1.1em;
+  color: #222;
+}
+
+.page>div {
+  font-size: 1.1em;
+  line-height: 1.6;
+
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+ul {
+  margin-top: 12px !important;
+}
+
+.nuxt-content {
+  font-size: 1.2em;
+}
+
+.fluid-width-video-container {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.fluid-width-video-wrapper {
+  width: 100%;
+  position: relative;
+  padding: 0;
+  padding-top: 0px;
+}
+
+.fluid-width-video-wrapper iframe,
+.fluid-width-video-wrapper object,
+.fluid-width-video-wrapper embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gist {
+  max-width: 920px;
+  margin: auto;
+  border: 0;
+}
+.card-body > p{
+  font-size: .8em;
+}
+pre {
+  max-width: 920px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 36px !important;
+  margin-bottom: 36px !important;
+  border: 0;
+  border-radius: 8px !important;
+}
+
+.gist-file {
+  border: 0 !important;
+}
+
+
+.nav-link {
+  text-transform: uppercase;
+  font-size: .9em;
+  color: #111
+}
+
+#hero {
+  background: url(/images/bgs/wavey.jpg);
+  background-repeat: repeat;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.phased {
+  background: linear-gradient(45deg, #00b0ff 11%, #B263FE 44%, #f333f5 66%, #fba1da 90%);
+  background-clip: border-box;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Righteous";
+  font-weight: 600;
+
+}
+
+.stars {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.67), rgba(0, 0, 0, 0.67)), url("/assets/images/bgs/stars.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-blend-mode: multiply;
+}
+
+.spiff {
+  font-weight: bold !important;
+  background: linear-gradient(45deg, #85422c 11%, #e8d426 90%) !important;
+  background-clip: border-box !important;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+
+}
+
+.lead {
+  font-size: 20px;
+}
+
+.quote {
+  background-color: #333;
+  color: #ccc;
+  font-style: italic;
+  border-radius: 8px;
+  border: 3px solid #ccc;
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 18px;
+  padding-bottom: 12px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.accent {
+  color: #00c3e6;
+}
+
+
+
+
+
+.nuxt-content-highlight {
+  padding-left: 0;
+  border-radius: 8px !important;
+}
+
+pre {
+  padding-left: 5px;
+  padding-top: 12px;
+}
+
+pre>code {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding-left: 24px;
+  padding-right: 32px;
+  line-height: 1.6;
+  width: 100%;
+  display: block;
+  white-space: pre;
+  overflow: auto;
+  font-size: 14px;
+
+}
+
+p>code,
+li>code {
+  font-family: Inconsolata, monospace, monaco, consolas, "Ubuntu Mono", "Monospace";
+  font-size: 16px;
+  background-color: #e0f7fb;
+  padding: 2px;
+  border: 1px solid #00c3e6;
+  color: #000099;
+  border-radius: 4px;
+}
+
+.graded {
+  background: #ECE9E6;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #FFFFFF, #ECE9E6);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.bluesy {
+
+  background: #ECE9E6;
+  background: -webkit-linear-gradient(to right, #FFFFFF, rgb(207, 239, 255));
+  background: linear-gradient(to left, rgb(236, 253, 253), rgb(207, 239, 255));
+}
+
+.striped {
+  box-shadow: 0 13px 27px -5px rgba(50, 50, 93, .25), 0 8px 16px -8px rgba(0, 0, 0, .3), 0 -6px 16px -6px rgba(0, 0, 0, .025)
+}
+
+.groovy {
+  line-height: 1.6;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.groovy-title {
+  line-height: 1.6;
+  font-family: 'Lora', serif;
+  font-size: 130%;
+}
+
+.electric {
+  background: #8A2387;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #F27121, #E94057, #8A2387);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #F27121, #E94057, #8A2387);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.morning {
+  background: #004FF9;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #FFF94C, #004FF9);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #FFF94C, #004FF9);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.sunset {
+  background: #c21500;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #ffc500, #c21500);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #ffc500, #c21500);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.embed-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.embed-container iframe,
+.embed-container object,
+.embed-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
