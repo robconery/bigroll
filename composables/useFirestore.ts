@@ -32,8 +32,11 @@ export const useFirestore = () => {
       }
       
       const userData = userSnapshot.data()
-      
-      return User.fromFirestore(userSnapshot.id, userData);
+      // Use the User model's fromFirestore static method to create a User instance
+      return new User({
+        id: userSnapshot.id,
+        ...userData
+      });
     } catch (error) {
       console.error('Error getting user by email:', error)
       throw error
@@ -42,7 +45,7 @@ export const useFirestore = () => {
 
   /**
    * Get all authorizations for a user by email
-   * @param email User's email address
+   * @param user The user object to get authorizations for
    * @returns Array of authorization data
    */
   const getAuthorizations = async (user: User): Promise<Authorization[]> => {
@@ -56,7 +59,11 @@ export const useFirestore = () => {
       const authorizations: Authorization[] = []
       querySnapshot.forEach((doc) => {
         const authData = doc.data()
-        authorizations.push(Authorization.fromFirestore(doc.id, authData));
+        // Use the Authorization model constructor to create Authorization instances
+        authorizations.push(new Authorization({
+          id: doc.id,
+          ...authData
+        }));
       })
 
       return authorizations
@@ -79,7 +86,7 @@ export const useFirestore = () => {
         return null
       }
       const authorizations = await getAuthorizations(user)
-      // Add authorizations to user object
+      // Add authorizations to user object using the User model's method
       user.authorizations = authorizations;
       return user;
     } catch (error) {
@@ -108,7 +115,11 @@ export const useFirestore = () => {
       const orders: Order[] = []
       querySnapshot.forEach((doc) => {
         const orderData = doc.data()
-        orders.push(Order.fromFirestore(doc.id, orderData));
+        // Use the Order model constructor to create Order instances
+        orders.push(new Order({
+          id: doc.id,
+          ...orderData
+        }));
       })
       return orders
     } catch (error) {
@@ -134,7 +145,11 @@ export const useFirestore = () => {
       }
       
       const orderData = orderSnapshot.data()
-      return Order.fromFirestore(orderSnapshot.id, orderData);
+      // Use the Order model constructor to create an Order instance
+      return new Order({
+        id: orderSnapshot.id,
+        ...orderData
+      });
     } catch (error) {
       console.error('Error getting order by number:', error)
       return null
@@ -157,7 +172,11 @@ export const useFirestore = () => {
         return null
       }
       
-      return Subscription.fromFirestore(subscriptionSnapshot.data());
+      // Use the Subscription model constructor to create a Subscription instance
+      return new Subscription({
+        id: subscriptionSnapshot.id,
+        ...subscriptionSnapshot.data()
+      });
     } catch (error) {
       console.error('Error getting subscription by email:', error)
       return null

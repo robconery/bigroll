@@ -61,12 +61,7 @@
                     }}</NuxtLink>
                   </h6>
                   <p class="mb-0 small">
-                    {{
-                      new Date(order.date.seconds * 1000).toLocaleDateString(
-                        undefined,
-                        { day: "2-digit", month: "2-digit", year: "numeric" }
-                      )
-                    }}
+                    {{ formatOrderDate(order.date) }}
                   </p>
                   <p v-if="order.status" class="mb-0 small">
                     <span>{{ order.status }}</span>
@@ -83,7 +78,9 @@
       <div class="col-lg-8">
         <!-- Title -->
         <h5 class="mb-0">🤙🏼</h5>
-        <h1 class="mb-2">{{ user?.displayName || user?.email }}</h1>
+        <h1 class="mb-2">
+          {{ userModel?.name || user?.displayName || user?.email }}
+        </h1>
 
         <!-- Profile update form -->
         <p>
@@ -281,10 +278,17 @@
 
 <script setup>
 const router = useRouter();
-const { user, logout, isLoading, authorizations, subscription } =
-  useFirebaseAuth();
-const { getOrdersByEmail, getSubscriptionByEmail } = useFirestore();
-const { getSignedUrl } = useFirebaseStorage();
+const {
+  user,
+  userModel,
+  logout,
+  isLoading,
+  authorizations,
+  subscription,
+  isAuthorizedFor,
+} = useFirebaseAuth();
+const { getOrdersByEmail } = useFirestore();
+const { getSignedUrl, getDownloadUrlForAuthorization } = useFirebaseStorage();
 
 // Reactive state for profile data
 const isUpdating = ref(false);
@@ -297,21 +301,13 @@ const profile = ref({
 const orders = ref([]);
 const isLoadingOrders = ref(true);
 
-// Subscription data
-const isLoadingSubscription = ref(true);
-
 // For download link generation
 const isGeneratingLink = ref(null);
 
 // Check if subscription is active (current_period_end is in the future)
 const isSubscriptionActive = computed(() => {
   if (!subscription.value) return false;
-
-  const now = new Date();
-  const endDate = new Date(
-    subscription.value.current_period_end.seconds * 1000
-  );
-  return endDate > now;
+  return subscription.value.isActive();
 });
 
 // Process authorizations to get downloads
@@ -322,11 +318,12 @@ const downloads = computed(() => {
     .filter((auth) => auth.download && auth.download.trim() !== "")
     .map((auth) => ({
       id: auth.id,
-      title: auth.download || `${auth.sku} Download`,
+      title: auth.sku || `${auth.sku} Download`,
       description: `Download for ${auth.sku}`,
       image: `/images/slides/${auth.sku}.jpg`,
       downloadUrl: auth.download,
       sku: auth.sku,
+      authorizationObj: auth, // Store the full authorization object for easier access
     }));
 });
 
@@ -348,17 +345,23 @@ const generateDownloadLink = async (item) => {
     isGeneratingLink.value = item.id;
 
     // Check if we have a valid download URL
-    if (!item.downloadUrl) {
-      alert("Download URL not available.");
+    if (!item.authorizationObj) {
+      alert("Download information not available.");
       return;
     }
 
-    // Generate a signed URL with 2-hour expiration
-    const signedUrl = await getSignedUrl(item.downloadUrl);
+    // Generate a signed URL using the Authorization model's method
+    const downloadUrl = await getDownloadUrlForAuthorization(
+      item.authorizationObj
+    );
+
+    if (!downloadUrl) {
+      alert("Unable to generate download link. Please try again later.");
+      return;
+    }
 
     // Open the signed URL in a new tab
-    //window.open(signedUrl, "_blank");
-    location.href = signedUrl;
+    location.href = downloadUrl;
   } catch (error) {
     console.error("Error generating download link:", error);
     alert("Failed to generate download link. Please try again later.");
@@ -376,7 +379,7 @@ watch(
       profile.value.name = newUser.displayName || "";
       profile.value.email = newUser.email || "";
 
-      // Fetch orders using our Firestore composable with UID instead of email
+      // Fetch orders using our Firestore composable with email
       try {
         isLoadingOrders.value = true;
         orders.value = await getOrdersByEmail(newUser.email);
@@ -385,6 +388,18 @@ watch(
       } finally {
         isLoadingOrders.value = false;
       }
+    }
+  },
+  { immediate: true }
+);
+
+// Also use userModel to populate profile when it changes
+watch(
+  userModel,
+  (newUserModel) => {
+    if (newUserModel) {
+      profile.value.name = newUserModel.name || "";
+      profile.value.email = newUserModel.email || "";
     }
   },
   { immediate: true }
@@ -412,6 +427,18 @@ const formatDate = (dateObj) => {
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+};
+
+const formatOrderDate = (date) => {
+  if (!date) return "";
+  // Handle both timestamp objects and ISO strings
+  const dateObj = date.seconds ? new Date(date.seconds * 1000) : new Date(date);
+
+  return dateObj.toLocaleDateString(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
 };
 

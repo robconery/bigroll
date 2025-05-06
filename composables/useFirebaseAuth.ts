@@ -9,47 +9,24 @@ import {
   sendSignInLinkToEmail as firebaseSendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink,
-  type User,
+  type User as FirebaseUser,
   type Auth
 } from 'firebase/auth'
 import { ref } from 'vue'
-
-// Define authorization types
-interface AuthorizationData {
-  id: string
-  email: string
-  sku: string
-  download?: string
-  date?: string
-  order?: string
-  offer?: string
-}
-
-// Define subscription type
-interface SubscriptionData {
-  // Add appropriate fields based on your subscription structure
-  id?: string
-  email?: string
-  plan?: string,
-  current_period_start?: string | { seconds: number },
-  current_period_end?: string | { seconds: number },
-  stripe_sub_id?: string,
-  stripe_customer_id?: string,
-  interval?: string,
-  // Add other fields as needed
-}
+import { User, Authorization, Subscription } from '~/server/models';
 
 // Create persistent refs outside the composable to share state
-const user = ref<User | null>(null)
-const authorizations = ref<AuthorizationData[]>([])
-const subscription = ref<SubscriptionData | null>(null)
+const user = ref<FirebaseUser | null>(null)
+const userModel = ref<User | null>(null)
+const authorizations = ref<Authorization[]>([])
+const subscription = ref<Subscription | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 let authStateInitialized = false
 
 export const useFirebaseAuth = () => {
   const { $auth } = useNuxtApp()
-  const { getAuthorizations, getSubscriptionByEmail } = useFirestore()
+  const { getUserByEmail, getAuthorizations, getSubscriptionByEmail } = useFirestore()
 
   // Initialize Firebase auth state observer if not already initialized
   const initAuthState = () => {
@@ -65,29 +42,54 @@ export const useFirebaseAuth = () => {
       // Update user state
       user.value = firebaseUser
       
-
-      // Handle authorizations
-      if (firebaseUser && firebaseUser.email) {
-        const firebaseAuths = await getAuthorizations({
-          id: firebaseUser.email,
-          email: firebaseUser.email,
-          uid: firebaseUser.uid
-        });
-        authorizations.value = firebaseAuths;
-
-      } else {
+      // Reset state when logged out
+      if (!firebaseUser) {
+        userModel.value = null;
         authorizations.value = [];
+        subscription.value = null;
+        isLoading.value = false;
+        return;
       }
-      
-      //do we have a sub?
-      if (firebaseUser && firebaseUser.email) {
-        const sub = await getSubscriptionByEmail(firebaseUser.email);
-        if (sub) {
-          subscription.value = sub;
+
+      // Fetch user data and authorizations when logged in
+      if (firebaseUser.email) {
+        try {
+          // Get user from Firestore
+          const fetchedUser = await getUserByEmail(firebaseUser.email);
+          
+          if (fetchedUser) {
+            userModel.value = fetchedUser;
+            
+            // Fetch authorizations
+            const fetchedAuths = await getAuthorizations(fetchedUser);
+            authorizations.value = fetchedAuths;
+            
+            // Associate authorizations with user
+            userModel.value.authorizations = fetchedAuths;
+            
+            // Fetch subscription
+            const fetchedSubscription = await getSubscriptionByEmail(firebaseUser.email);
+            if (fetchedSubscription) {
+              subscription.value = fetchedSubscription;
+            } else {
+              subscription.value = null;
+            }
+          } else {
+            // Create a new user model if not found in Firestore
+            userModel.value = new User({
+              email: firebaseUser.email,
+              uid: firebaseUser.uid,
+              name: firebaseUser.displayName || undefined
+            });
+            authorizations.value = [];
+            subscription.value = null;
+          }
+        } catch (e) {
+          console.error('Error fetching user data:', e);
         }
       }
-
-      isLoading.value = false
+      
+      isLoading.value = false;
     })
   }
 
@@ -188,7 +190,7 @@ export const useFirebaseAuth = () => {
       isLoading.value = true
       await signOut($auth as Auth)
       // User will be set to null by the auth state observer
-      // and clearAuthorizations will be called
+      // and state will be cleared
     } catch (e: any) {
       error.value = e.message
       throw e
@@ -197,9 +199,17 @@ export const useFirebaseAuth = () => {
     }
   }
 
+  // Check if a user is authorized for a specific SKU
+  const isAuthorizedFor = (sku: string): boolean => {
+    if (!userModel.value || !userModel.value.authorizations) {
+      return false;
+    }
+    return userModel.value.isAuthorizedFor(sku);
+  }
 
   return {
     user,
+    userModel,
     authorizations,
     subscription,
     isLoading,
@@ -210,6 +220,7 @@ export const useFirebaseAuth = () => {
     completeSignInWithEmailLink,
     loginWithGoogle,
     loginWithGithub,
-    logout
+    logout,
+    isAuthorizedFor
   }
 }
