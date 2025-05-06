@@ -1,0 +1,67 @@
+{
+  "id": "evt_0KcaCifqGyWN1S0VTKFPC3Jl",
+  "object": "event",
+  "api_version": "2019-12-03",
+  "created": 1647111735,
+  "data": {
+    "object": {
+      "id": "cs_live_a1zQXTZhcB3HCB006yohr1hfBQ9TbG66VpCDD8t5flxNBILvUTyj92Ttsw",
+      "object": "checkout.session",
+      "livemode": true,
+      "payment_intent": "pi_2KcwQhfqGyWN1S0V1jiiyjCS",
+      "status": "complete",
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 9900,
+      "amount_total": 9900,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "consent": null,
+      "consent_collection": null,
+      "currency": "usd",
+      "customer": "cus_LJZaRRN3L4T8GJ",
+      "customer_creation": "always",
+      "customer_details": {
+        "email": "robconery@gmail.com",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "expires_at": 1647283571,
+      "locale": "auto",
+      "metadata": {
+        "file": "The Imposter's Handbook, Second Edition.zip",
+        "sku": "imposter-second"
+      },
+      "mode": "payment",
+      "payment_link": "plink_0KcwBVfqGyWN1S0Vb0SROEJ7",
+      "payment_method_options": {},
+      "payment_method_types": ["card", "alipay"],
+      "payment_status": "paid",
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "setup_intent": null,
+      "shipping": null,
+      "shipping_address_collection": null,
+      "shipping_options": [],
+      "shipping_rate": null,
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://stripe.com",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "url": null
+    }
+  }
+}

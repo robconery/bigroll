@@ -21,6 +21,8 @@ export class Authorization extends Firefly<Authorization> {
     this.order = data.order;
     this.offer = data.offer;
     this.link = data.link;
+    //override the id to be email-sku
+    this.id = `${this.email}-${this.sku}`;
   }
 
   async getDownloadUrl(): Promise<string | null> {
