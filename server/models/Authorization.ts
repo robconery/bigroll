@@ -20,7 +20,7 @@ export class Authorization extends Firefly<Authorization> {
     this.date = data.date || new Date().toISOString();
     this.order = data.order;
     this.offer = data.offer;
-    this.link = data.link;
+    this.link = data.link || "";
     //override the id to be email-sku
     this.id = `${this.email}-${this.sku}`;
   }
@@ -47,6 +47,22 @@ export class Authorization extends Firefly<Authorization> {
       console.error('Error getting signed URL:', error)
       return "";
     }
+  }
+
+  static async getByEmail(email: string): Promise<Authorization[]> {
+    const authorizations = await Authorization.filter({ email: email.toLowerCase() });
+
+    if (authorizations.length === 0) {
+      console.log('No matching documents.');
+      return [];
+    }
+    const out = [];
+    for(let doc of authorizations) {
+      if (doc.download && doc.download.length > 0) {
+        out.push(doc);
+      }
+    }
+    return out;
   }
 }
 

@@ -24,6 +24,18 @@ export default defineContentConfig({
         link: z.string(),
       })
     }),
+    posts: defineCollection({
+      type: 'page',
+      source: 'posts/*.md',
+      schema: z.object({
+        title: z.string(),
+        summary: z.string(),
+        date: z.string(),
+        uuid: z.string(),
+        slug: z.string(),
+        categories: z.string()
+      })
+    }),
     courses: defineCollection({
       type: 'page',
       source: 'courses/*.md',

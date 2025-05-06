@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { getDownloadsByEmail } from './admin'
+import { Authorization } from '../models'
 import 'dotenv/config'
 
 // Create a nodemailer transporter using environment variables
@@ -24,11 +24,11 @@ export async function sendEmailWithDownloads(email: string) {
   console.log(`Sending download links to ${email}`)
   
   const transporter = createTransporter()
-  const downloads = await getDownloadsByEmail(email)
+  const downloads = await Authorization.getByEmail(email)
   
   let downloadLinks = []
   for (let d of downloads) {
-    downloadLinks.push(`<li><a href="${d.link}">${d.download}</a></li>`)
+    downloadLinks.push(`<li><a href="${d.getDownloadUrl()}">${d.download}</a></li>`)
   }
   const linkHtml = downloadLinks.join('\n')
   
