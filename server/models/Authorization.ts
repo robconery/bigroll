@@ -1,8 +1,9 @@
+import { Firefly } from '../lib/firefly';
+import { getStorage, getDownloadURL } from 'firebase-admin/storage';
 /**
  * Authorization model representing a user's access permission to a product
  */
-export class Authorization {
-  id: string;
+export class Authorization extends Firefly<Authorization> {
   email: string;
   sku: string;
   download?: string;
@@ -12,7 +13,7 @@ export class Authorization {
   link?: string; // For download URL
 
   constructor(data: Partial<Authorization> = {}) {
-    this.id = data.id || '';
+    super(data);
     this.email = data.email?.toLowerCase() || '';
     this.sku = data.sku || '';
     this.download = data.download;
@@ -22,39 +23,28 @@ export class Authorization {
     this.link = data.link;
   }
 
-  /**
-   * Creates an Authorization object from Firestore data
-   */
-  static fromFirestore(id: string, data: any): Authorization {
-    return new Authorization({
-      id: id,
-      email: data.email,
-      sku: data.sku,
-      download: data.download,
-      date: data.date,
-      order: data.order,
-      offer: data.offer,
-      link: data.link
-    });
-  }
-
-  /**
-   * Converts Authorization object to a plain object for Firestore
-   */
-  toFirestore(): Record<string, any> {
-    const auth: Record<string, any> = {
-      email: this.email.toLowerCase(),
-      sku: this.sku
-    };
-
-    if (this.download) auth.download = this.download;
-    if (this.date) auth.date = this.date;
-    if (this.order) auth.order = this.order;
-    if (this.offer) auth.offer = this.offer;
+  async getDownloadUrl(): Promise<string | null> {
+    if (!this.download) {
+      return null;
+    }
+    let storagePath = this.download
     
-    // link is a runtime property, not stored in Firestore
-    
-    return auth;
+    // Create a reference from the storage path
+    const storageRef = this.storage.bucket().file(storagePath)
+    try {
+      // Generate a signed URL that expires in 2 hours (7200 seconds)
+      const signedUrl = await getDownloadURL(storageRef)
+      
+      // For web-based Firebase Storage, we can't directly set expiration on client side
+      // The URL itself is already time-limited by Firebase
+      // We append a token parameter to help track links
+      const expiryTime = Date.now() + 2 * 60 * 60 * 1000 // 2 hours in milliseconds
+      const tokenizedUrl = `${signedUrl}&token=${expiryTime}`
+      return tokenizedUrl
+    } catch (error) {
+      console.error('Error getting signed URL:', error)
+      return "";
+    }
   }
 }
 

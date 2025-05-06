@@ -2,7 +2,7 @@ import { defineEventHandler, readBody, createError, getHeader } from 'h3'
 import Stripe from 'stripe'
 import { Order, Authorization } from '../models'
 import { get, updateOne, fbApp } from '../lib/firefly.cjs'
-
+import "dotenv/config"
 // Initialize Stripe with the API key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   // @ts-ignore - Typescript might have a newer version in its type definitions

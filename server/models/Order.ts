@@ -1,8 +1,10 @@
+import { Firefly } from '../lib/firefly';
+import { Authorization, Offer } from './';
+
 /**
  * Order model representing an order in the system
  */
-export class Order {
-  id: string;
+export class Order extends Firefly<Order> {
   number: string;
   date: string;
   name?: string;
@@ -13,10 +15,9 @@ export class Order {
   store?: string;
   total?: number;
   status?: string;
-  items?: any[];
 
   constructor(data: Partial<Order> = {}) {
-    this.id = data.id || '';
+    super(data);
     this.number = data.number || '';
     this.date = data.date || new Date().toISOString();
     this.name = data.name;
@@ -26,50 +27,63 @@ export class Order {
     this.uid = data.uid;
     this.store = data.store;
     this.total = data.total;
-    this.status = data.status;
-    this.items = data.items || [];
+    this.status = data.status || 'pending';
+
   }
 
-  /**
-   * Creates an Order object from Firestore data
-   */
-  static fromFirestore(id: string, data: any): Order {
-    return new Order({
-      id: id,
-      number: data.number,
-      date: data.date,
-      name: data.name,
-      email: data.email,
-      slug: data.slug,
-      offer: data.offer,
-      uid: data.uid,
-      store: data.store,
-      total: data.total,
-      status: data.status,
-      items: data.items
+  static async saveThriveOrder(data: any): Promise<[Order, Authorization[]]> {
+    const { order, customer, base_product_label: slug } = data;
+
+    // Create the order number based on the order.id from thrive, using the last 5 digits
+    const orderNumber = `RED4-${order.id.slice(-8)}`;
+
+    // Create the order object using the Order class
+    const newOrder = new Order({
+      number: orderNumber,
+      date: order.date_iso8601,
+      name: `${customer.first_name} ${customer.last_name}`.trim(),
+      email: customer.email.toLowerCase(),
+      slug: slug,
+      total: parseInt(order.total, 10),
+      store: 'thrivecart',
+      offer: order.charges[0].name,
     });
-  }
+    await newOrder.save();
 
-  /**
-   * Converts Order object to a plain object for Firestore
-   */
-  toFirestore(): Record<string, any> {
-    const order: Record<string, any> = {
-      number: this.number,
-      date: this.date,
-      email: this.email.toLowerCase(),
-      slug: this.slug,
-      offer: this.offer
-    };
+    //get the offer for the order based on slug
+    const offer = await Offer.find({ slug: slug });
+    if (!offer) {
+      console.error(`Offer not found for Thrive ID: ${order.id}`);
+      return [newOrder, []];
+    }
 
-    if (this.name) order.name = this.name;
-    if (this.uid) order.uid = this.uid;
-    if (this.store) order.store = this.store;
-    if (this.total !== undefined) order.total = this.total;
-    if (this.status) order.status = this.status;
-    if (this.items?.length) order.items = this.items;
+    //get the products for the offer
+    const products = await offer.getProducts();
+    if (!products || products.length === 0) {
+      console.error(`No products found for offer: ${offer.slug}`);
+      return [newOrder, []];
+    }
+    //authorize each product in the order
+    const authorizations: Authorization[] = [];
+    for (const product of products) {
+      const authorization = new Authorization({
+        email: customer.email.toLowerCase(),
+        sku: product.sku,
+        date: order.date_iso8601,
+        order: orderNumber,
+        offer: offer.slug,
+      });
+      await authorization.save();
+      authorizations.push(authorization);
+    }
 
-    return order;
+    newOrder.status = 'completed';
+    await newOrder.save();
+    return [newOrder, authorizations];
+
+    //send an email to the user with the order details
+
+
   }
 }
 

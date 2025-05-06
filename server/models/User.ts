@@ -1,49 +1,21 @@
 import { Authorization } from './Authorization';
+import { Firefly } from '../lib/firefly';
 
 /**
  * User model representing a user in the system
  */
-export class User {
-  id: string;
+export class User extends Firefly<User> {
   email: string;
   name?: string;
   uid: string;
   authorizations?: Authorization[];
 
   constructor(data: Partial<User> = {}) {
-    this.id = data.id || '';
+    super(data);
     this.email = data.email?.toLowerCase() || '';
     this.name = data.name;
     this.uid = data.uid || '';
     this.authorizations = data.authorizations || [];
-  }
-
-  /**
-   * Creates a User object from Firestore data
-   */
-  static fromFirestore(id: string, data: any): User {
-    return new User({
-      id: id,
-      email: data.email,
-      name: data.name,
-      uid: data.uid
-    });
-  }
-
-  /**
-   * Converts User object to a plain object for Firestore
-   */
-  toFirestore(): Record<string, any> {
-    const user: Record<string, any> = {
-      email: this.email.toLowerCase(),
-      uid: this.uid
-    };
-
-    if (this.name) user.name = this.name;
-    
-    // authorizations are stored separately in Firestore
-    
-    return user;
   }
 
   /**
@@ -63,10 +35,27 @@ export class User {
     if (!this.authorizations) return false;
     return this.authorizations.some(auth => auth.sku === sku);
   }
+
+  static async getDownloads(email: string){
+    const authorizations = await Authorization.filter({ email: email.toLowerCase() });
+
+    if (authorizations.length === 0) {
+      console.log('No matching documents.');
+      return [];
+    }
+    const out = [];
+    for(let doc of authorizations) {
+      if (doc.download && doc.download.length > 0) {
+        const downloadUrl = await doc.getDownloadUrl();
+        if (downloadUrl && downloadUrl.length > 0)
+          out.push(doc);
+      }
+    }
+    return out;
+  }
 }
 
-// Type alias for backward compatibility with existing code
+// We no longer need these type aliases as User class is properly typed
+// Keeping them for backward compatibility
 export type UserData = User;
-
-// Type alias for User with authorizations
 export type UserWithAuthorizations = User;
