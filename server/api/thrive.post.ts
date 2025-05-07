@@ -1,6 +1,4 @@
 import { defineEventHandler, readBody } from 'h3'
-import nodemailer from 'nodemailer'
-import { getDownloadsByEmail } from '../lib/admin';
 
 export default defineEventHandler(async (event) => {
 

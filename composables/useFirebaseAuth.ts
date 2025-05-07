@@ -13,13 +13,12 @@ import {
   type Auth
 } from 'firebase/auth'
 import { ref } from 'vue'
-import { User, Authorization, Subscription } from '~/server/models';
 
 // Create persistent refs outside the composable to share state
 const user = ref<FirebaseUser | null>(null)
-const userModel = ref<User | null>(null)
-const authorizations = ref<Authorization[]>([])
-const subscription = ref<Subscription | null>(null)
+const userModel = ref<any>(null)
+const authorizations = ref<any[]>([])
+const subscription = ref<any>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 let authStateInitialized = false
@@ -76,11 +75,12 @@ export const useFirebaseAuth = () => {
             }
           } else {
             // Create a new user model if not found in Firestore
-            userModel.value = new User({
+            userModel.value = {
               email: firebaseUser.email,
               uid: firebaseUser.uid,
-              name: firebaseUser.displayName || undefined
-            });
+              name: firebaseUser.displayName || undefined,
+              authorizations: []
+            };
             authorizations.value = [];
             subscription.value = null;
           }
@@ -204,7 +204,9 @@ export const useFirebaseAuth = () => {
     if (!userModel.value || !userModel.value.authorizations) {
       return false;
     }
-    return userModel.value.isAuthorizedFor(sku);
+    
+    // Simple implementation without using the User model's method
+    return userModel.value.authorizations.some((auth: any) => auth.sku === sku);
   }
 
   return {

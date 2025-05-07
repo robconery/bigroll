@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import nodemailer from 'nodemailer'
 import { Authorization } from '../models'
-import 'dotenv/config'
+
 
 // Create a nodemailer transporter using environment variables
 const createTransporter = () => {
@@ -31,7 +32,7 @@ export async function sendEmailWithDownloads(email: string) {
     downloadLinks.push(`<li><a href="${d.getDownloadUrl()}">${d.download}</a></li>`)
   }
   const linkHtml = downloadLinks.join('\n')
-  
+  //const linkHtml = "";
   // Email content
   const emailContent = {
     from: '"Big Machine" <rob@bigmachine.io>',

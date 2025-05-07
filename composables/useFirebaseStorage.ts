@@ -1,6 +1,5 @@
 import { ref, getDownloadURL } from 'firebase/storage'
 import { ref as vueRef } from 'vue'
-import { Authorization } from '~/server/models'
 
 export const useFirebaseStorage = () => {
   const { $storage } = useNuxtApp()

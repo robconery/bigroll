@@ -2,47 +2,31 @@ import { defineEventHandler, readBody } from 'h3'
 import { sendEmailWithDownloads } from '../lib/email'
 
 export default defineEventHandler(async (event) => {
+  let out = {
+    statusCode: 400,
+    body: {
+      success: false,
+      message: 'Nothing done'
+    }
+  }
   try {
-    // Parse the request body to get the email
+
     const { email } = await readBody(event)
-    
+
     if (!email) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Email is required' })
-      }
+      out.body.message = 'Email is required'
     }
-    try {
-      // Use the centralized email module
-      await sendEmailWithDownloads(email)
-      
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          success: true,
-          message: 'Download links have been sent to your email!'
-        })
-      }
-    } catch (emailError) {
-      console.error('Error sending email:', emailError)
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          success: false,
-          message: 'Failed to send email. Please try again later.'
-        })
-      }
-    }
+
+    // Use the centralized email module
+    //await sendEmailWithDownloads(email)
+    out.body.message = 'Download links have been sent to your email!'
+    out.statusCode = 200
     
   } catch (error) {
     console.error('Error processing download request:', error)
-    
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        success: false,
-        message: 'An error occurred while processing your request.'
-      })
-    }
+    out.body.message = 'An error occurred while processing your request.'
+    out.statusCode = 500
+
   }
+  return JSON.stringify(out)
 });

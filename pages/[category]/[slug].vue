@@ -70,34 +70,27 @@
 <script setup>
 const route = useRoute();
 const { category, slug } = route.params;
-const pending = ref(true);
 
+// Fetch all posts in the specified category
 // Fetch current post
-const { data: post } = await useAsyncData(
-  `post-${category}-${slug}`,
-  async () => {
-    // Find post with matching slug in the specified category
-    const foundPost = await queryCollection("posts")
-      .where("slug", "==", slug)
-      .where("categories", "==", category)
-      .first();
-
-    pending.value = false;
-    return foundPost;
-  }
-);
+const { data: post } = await useAsyncData(`post-${category}-${slug}`, () => {
+  // Find post with matching slug in the specified category
+  return queryCollection("posts")
+    .where("slug", "=", slug)
+    .where("categories", "=", category.toLowerCase())
+    .first();
+});
 
 // Fetch all posts in the same category for navigation
 const { data: categoryPosts } = await useAsyncData(
   `category-posts-${category}`,
   () => {
-    return queryCollection("posts")
-      .where("categories", "==", category)
-      .sort({ date: -1 })
-      .all();
+    return queryCollection("posts").where("categories", "=", category).all();
   }
 );
-
+const pending = computed(() => {
+  return post.value === null && categoryPosts.value === null;
+});
 // Find previous and next posts for navigation
 const currentIndex = computed(() => {
   if (!categoryPosts.value || !post.value) return -1;

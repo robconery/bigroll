@@ -10,7 +10,6 @@ import {
   type Firestore,
   type QuerySnapshot
 } from 'firebase/firestore'
-import { User, Order, Authorization, Subscription } from '~/server/models';
 
 export const useFirestore = () => {
   const { $firestore } = useNuxtApp()
@@ -20,7 +19,7 @@ export const useFirestore = () => {
    * @param email User's email address
    * @returns User data or null if not found
    */
-  const getUserByEmail = async (email: string): Promise<User | null> => {
+  const getUserByEmail = async (email: string): Promise<any | null> => {
     try {
       const firestore = $firestore as Firestore
       // Use email directly as the document ID
@@ -32,11 +31,11 @@ export const useFirestore = () => {
       }
       
       const userData = userSnapshot.data()
-      // Use the User model's fromFirestore static method to create a User instance
-      return new User({
+      // Return the raw data with ID added
+      return {
         id: userSnapshot.id,
         ...userData
-      });
+      };
     } catch (error) {
       console.error('Error getting user by email:', error)
       throw error
@@ -48,7 +47,7 @@ export const useFirestore = () => {
    * @param user The user object to get authorizations for
    * @returns Array of authorization data
    */
-  const getAuthorizations = async (user: User): Promise<Authorization[]> => {
+  const getAuthorizations = async (user: any): Promise<any[]> => {
     try {
       const firestore = $firestore as Firestore
       const authsRef = collection(firestore, 'authorizations')
@@ -56,14 +55,14 @@ export const useFirestore = () => {
       
       const querySnapshot = await getDocs(q)
       
-      const authorizations: Authorization[] = []
+      const authorizations: any[] = []
       querySnapshot.forEach((doc) => {
         const authData = doc.data()
-        // Use the Authorization model constructor to create Authorization instances
-        authorizations.push(new Authorization({
+        // Return raw data with ID added
+        authorizations.push({
           id: doc.id,
           ...authData
-        }));
+        });
       })
 
       return authorizations
@@ -78,7 +77,7 @@ export const useFirestore = () => {
    * @param email User's email address
    * @returns User data with authorizations or null if not found
    */
-  const checkAuthorized = async (email: string): Promise<User | null> => {
+  const checkAuthorized = async (email: string): Promise<any | null> => {
     try {
       // Get user data and authorizations in parallel
       const user = await getUserByEmail(email)
@@ -86,7 +85,7 @@ export const useFirestore = () => {
         return null
       }
       const authorizations = await getAuthorizations(user)
-      // Add authorizations to user object using the User model's method
+      // Add authorizations to user object
       user.authorizations = authorizations;
       return user;
     } catch (error) {
@@ -100,7 +99,7 @@ export const useFirestore = () => {
    * @param email User's email address
    * @returns Array of order data
    */
-  const getOrdersByEmail = async (email: string): Promise<Order[]> => {
+  const getOrdersByEmail = async (email: string): Promise<any[]> => {
     try {
       console.log('Fetching orders for email:', email)
       const firestore = $firestore as Firestore
@@ -112,14 +111,14 @@ export const useFirestore = () => {
       
       const querySnapshot = await getDocs(q)
       
-      const orders: Order[] = []
+      const orders: any[] = []
       querySnapshot.forEach((doc) => {
         const orderData = doc.data()
-        // Use the Order model constructor to create Order instances
-        orders.push(new Order({
+        // Return raw data with ID added
+        orders.push({
           id: doc.id,
           ...orderData
-        }));
+        });
       })
       return orders
     } catch (error) {
@@ -133,7 +132,7 @@ export const useFirestore = () => {
    * @param number Order number
    * @returns Order data or null if not found
    */
-  const getOrderByNumber = async (number: string): Promise<Order | null> => {
+  const getOrderByNumber = async (number: string): Promise<any | null> => {
     try {
       const firestore = $firestore as Firestore
       // Use order number as the document ID as that's how it's stored in Firestore
@@ -145,11 +144,11 @@ export const useFirestore = () => {
       }
       
       const orderData = orderSnapshot.data()
-      // Use the Order model constructor to create an Order instance
-      return new Order({
+      // Return raw data with ID added
+      return {
         id: orderSnapshot.id,
         ...orderData
-      });
+      };
     } catch (error) {
       console.error('Error getting order by number:', error)
       return null
@@ -161,7 +160,7 @@ export const useFirestore = () => {
    * @param email User's email address
    * @returns Subscription data or null if not found
    */
-  const getSubscriptionByEmail = async (email: string): Promise<Subscription | null> => {
+  const getSubscriptionByEmail = async (email: string): Promise<any | null> => {
     try {
       const firestore = $firestore as Firestore
       // Use email directly as the document ID as that's how it's stored in Firestore
@@ -172,11 +171,11 @@ export const useFirestore = () => {
         return null
       }
       
-      // Use the Subscription model constructor to create a Subscription instance
-      return new Subscription({
+      // Return raw data with ID added
+      return {
         id: subscriptionSnapshot.id,
         ...subscriptionSnapshot.data()
-      });
+      };
     } catch (error) {
       console.error('Error getting subscription by email:', error)
       return null
