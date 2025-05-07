@@ -29,6 +29,12 @@ export const useFirebaseAuth = () => {
 
   // Initialize Firebase auth state observer if not already initialized
   const initAuthState = () => {
+    // Skip initialization on server side
+    if (process.server) {
+      console.log('Skipping auth initialization on server')
+      return
+    }
+    
     if (authStateInitialized) return
     
     console.log('Initializing auth state observer')

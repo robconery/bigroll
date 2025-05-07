@@ -136,8 +136,11 @@ const router = useRouter();
 const { $auth } = useNuxtApp();
 
 onMounted(async () => {
+  // Only run Firebase authentication code on the client side
+  if (!process.client) return;
+
   // Check if the URL contains an email sign-in link
-  if (process.client && isSignInWithEmailLink($auth, window.location.href)) {
+  if (isSignInWithEmailLink($auth, window.location.href)) {
     isProcessingEmailLink.value = true;
 
     // Get the email from localStorage that was saved when sending the link

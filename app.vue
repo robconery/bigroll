@@ -417,17 +417,19 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, onBeforeMount } from "vue";
 
 // Use our simplified Firebase Auth composable
 const { user, authorizations, isLoading, logout, initAuthState } =
   useFirebaseAuth();
 const router = useRouter();
 
-// Initialize auth state once when the app loads
-onMounted(() => {
-  console.log("App mounted, initializing auth state");
-  initAuthState();
+// Initialize auth state once when the app loads, but only on client side
+onBeforeMount(() => {
+  if (process.client) {
+    console.log("App before mount (client-side only), initializing auth state");
+    initAuthState();
+  }
 });
 
 // Handle logout
