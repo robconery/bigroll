@@ -50,23 +50,17 @@
                 >
                 <ul class="dropdown-menu" aria-labelledby="accounntMenu">
                   <li>
-                    <a
-                      class="dropdown-item"
-                      href="https://sales.bigmachine.io/imposter-second"
+                    <a class="dropdown-item" href="/offers/imposter-second"
                       >The Imposter's Handbook</a
                     >
                   </li>
                   <li>
-                    <a
-                      class="dropdown-item"
-                      href="https://sales.bigmachine.io/roadmap"
+                    <a class="dropdown-item" href="/offers/roadmap"
                       >The Imposter's Roadmap</a
                     >
                   </li>
                   <li>
-                    <a
-                      class="dropdown-item"
-                      href="https://sales.bigmachine.io/curious-moon"
+                    <a class="dropdown-item" href="/offers/curious-moon"
                       >A Curious Moon</a
                     >
                   </li>

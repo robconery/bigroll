@@ -3,7 +3,7 @@ title: The Imposter's Handbook, Second Edition
 summary: Computer Science concepts for self-taught programmers
 price: 30.00
 offer: imposter-second
-stripe: "https://buy.stripe.com/YOUR_STRIPE_LINK"
+stripe: "https://buy.stripe.com/cN2dR4d9c7E42isfZ8"
 ---
 
 ::sales-hero{image="/images/slides/imposter-second.jpg"}

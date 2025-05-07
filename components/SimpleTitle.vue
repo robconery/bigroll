@@ -13,9 +13,3 @@
 <script setup lang="ts">
 defineProps({});
 </script>
-<style>
-.titled {
-  padding: 2rem 0;
-  text-align: center;
-}
-</style>

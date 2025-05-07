@@ -22,6 +22,9 @@
           </div>
         </div>
       </div>
+      <p v-if="link" class="text-center">
+        <BigButton :text="buttonText" :link="link" class="mt-4" />
+      </p>
     </div>
   </section>
 </template>
@@ -29,6 +32,14 @@
 <script setup lang="ts">
 defineProps({
   vimeo: {
+    type: String,
+    default: null,
+  },
+  link: {
+    type: String,
+    default: null,
+  },
+  buttonText: {
     type: String,
     default: null,
   },

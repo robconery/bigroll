@@ -4,7 +4,7 @@
       class="bg-light text-center p-4 rounded-3 border border-1 position-relative"
     >
       <!-- Avatar -->
-      <div class="avatar-xxl text-center mb-3 mx-auto">
+      <div class="avatar-xxl text-center mb-3 mx-auto" v-if="image">
         <img
           class="avatar-img rounded-circle"
           :src="`/images/testimonials/${image}`"
