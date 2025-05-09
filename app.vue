@@ -147,9 +147,9 @@
                     </li>
                     <!-- Links -->
                     <li>
-                      <a class="dropdown-item" href="/dashboard">
+                      <NuxtLink class="dropdown-item" to="/dashboard">
                         <i class="bi bi-person fa-fw me-2"></i>Dashboard
-                      </a>
+                      </NuxtLink>
                     </li>
                     <li>
                       <a
@@ -298,16 +298,6 @@
                     >
                   </li>
                   <li class="nav-item">
-                    <NuxtLink class="nav-link text-light" to="/terms"
-                      >Terms</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <NuxtLink class="nav-link text-light" to="/privacy"
-                      >Privacy</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-item">
                     <a
                       class="nav-link text-light"
                       href="https://thisdeveloperslife.com"
@@ -400,12 +390,12 @@ const { user, authorizations, isLoading, logout, initAuthState } =
 const router = useRouter();
 
 // Initialize auth state once when the app loads, but only on client side
-// onBeforeMount(() => {
-//   if (process.client) {
-//     console.log("App before mount (client-side only), initializing auth state");
-//     initAuthState();
-//   }
-// });
+onBeforeMount(() => {
+  if (import.meta.client) {
+    console.log("App before mount (client-side only), initializing auth state");
+    initAuthState();
+  }
+});
 
 // Handle logout
 const handleLogout = async () => {

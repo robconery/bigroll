@@ -321,7 +321,7 @@ const downloads = computed(() => {
       title: auth.sku || `${auth.sku} Download`,
       description: `Download for ${auth.sku}`,
       image: `/images/slides/${auth.sku}.jpg`,
-      downloadUrl: auth.download,
+      download: auth.download,
       sku: auth.sku,
       authorizationObj: auth, // Store the full authorization object for easier access
     }));
@@ -351,9 +351,7 @@ const generateDownloadLink = async (item) => {
     }
 
     // Generate a signed URL using the Authorization model's method
-    const downloadUrl = await getDownloadUrlForAuthorization(
-      item.authorizationObj
-    );
+    const downloadUrl = await getSignedUrl(item.download);
 
     if (!downloadUrl) {
       alert("Unable to generate download link. Please try again later.");
