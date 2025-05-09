@@ -2,7 +2,7 @@ import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
   // Skip authentication check on the server side
-  if (process.server) {
+  if (import.meta.server) {
     console.log('Skipping auth check on server')
     return
   }

@@ -102,85 +102,66 @@
               <!-- Auth links -->
               <template v-if="user">
                 <!-- Admin buttons -->
-                <template v-if="isAdmin">
-                  <li class="nav-item ms-2">
-                    <a class="btn btn-dark btn-sm mt-1 mb-0" href="/rob">
-                      <i class="fa fa-home"></i>
-                      Admin
-                    </a>
-                  </li>
-                  <li class="nav-item ms-2">
-                    <a class="btn btn-dark btn-sm mt-1 mb-0" href="/juice">
-                      <i class="fa fa-home"></i>
-                      CMS
-                    </a>
-                  </li>
-                </template>
+
                 <!-- Regular user -->
-                <template v-else>
-                  <!-- User avatar with dropdown -->
-                  <li class="nav-item dropdown ms-2">
-                    <a
-                      class="avatar avatar-sm p-0"
-                      href="#"
-                      id="profileDropdown"
-                      role="button"
-                      data-bs-auto-close="outside"
-                      data-bs-display="static"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <img
-                        class="avatar-img rounded-circle"
-                        :src="userAvatar"
-                        alt="avatar"
-                      />
-                    </a>
-                    <ul
-                      class="dropdown-menu dropdown-animation dropdown-menu-end shadow pt-3"
-                      aria-labelledby="profileDropdown"
-                    >
-                      <!-- Avatar -->
-                      <li class="px-3">
-                        <div class="d-flex align-items-center">
-                          <!-- Avatar -->
-                          <div class="avatar me-3">
-                            <img
-                              class="avatar-img rounded-circle shadow"
-                              :src="userAvatar"
-                              alt="avatar"
-                            />
-                          </div>
-                          <div>
-                            <a class="h6" href="#">{{ userName }}</a>
-                            <p class="small m-0">{{ user.email }}</p>
-                          </div>
+
+                <!-- User avatar with dropdown -->
+                <li class="nav-item dropdown ms-2">
+                  <a
+                    class="avatar avatar-sm p-0"
+                    href="#"
+                    id="profileDropdown"
+                    role="button"
+                    data-bs-auto-close="outside"
+                    data-bs-display="static"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <img
+                      class="avatar-img rounded-circle"
+                      :src="userAvatar"
+                      alt="avatar"
+                    />
+                  </a>
+                  <ul
+                    class="dropdown-menu dropdown-animation dropdown-menu-end shadow pt-3"
+                    aria-labelledby="profileDropdown"
+                  >
+                    <!-- Avatar -->
+                    <li class="px-3">
+                      <div class="d-flex align-items-center">
+                        <!-- Avatar -->
+                        <div class="avatar me-3">
+                          <img
+                            class="avatar-img rounded-circle shadow"
+                            :src="userAvatar"
+                            alt="avatar"
+                          />
                         </div>
-                        <hr />
-                      </li>
-                      <!-- Links -->
-                      <li>
-                        <NuxtLink class="dropdown-item" to="/dashboard">
-                          <i class="bi bi-person fa-fw me-2"></i>Dashboard
-                        </NuxtLink>
-                      </li>
-                      <li>
-                        <NuxtLink class="dropdown-item" to="/settings">
-                          <i class="bi bi-gear fa-fw me-2"></i>Account Settings
-                        </NuxtLink>
-                      </li>
-                      <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          @click.prevent="handleLogout"
-                        >
-                          <i class="bi bi-power fa-fw me-2"></i>Sign Out
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                </template>
+                        <div>
+                          <a class="h6" href="#">{{ userName }}</a>
+                          <p class="small m-0">{{ user.email }}</p>
+                        </div>
+                      </div>
+                      <hr />
+                    </li>
+                    <!-- Links -->
+                    <li>
+                      <a class="dropdown-item" href="/dashboard">
+                        <i class="bi bi-person fa-fw me-2"></i>Dashboard
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent="handleLogout"
+                      >
+                        <i class="bi bi-power fa-fw me-2"></i>Sign Out
+                      </a>
+                    </li>
+                  </ul>
+                </li>
               </template>
               <!-- Guest links -->
               <template v-else>
@@ -419,12 +400,12 @@ const { user, authorizations, isLoading, logout, initAuthState } =
 const router = useRouter();
 
 // Initialize auth state once when the app loads, but only on client side
-onBeforeMount(() => {
-  if (process.client) {
-    console.log("App before mount (client-side only), initializing auth state");
-    initAuthState();
-  }
-});
+// onBeforeMount(() => {
+//   if (process.client) {
+//     console.log("App before mount (client-side only), initializing auth state");
+//     initAuthState();
+//   }
+// });
 
 // Handle logout
 const handleLogout = async () => {

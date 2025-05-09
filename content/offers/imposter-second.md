@@ -89,9 +89,6 @@ I am a transitioning Marine trying to pivot back to software development after a
 ::testimonial-small{name="Dan Kahler" image="dan_kahler.jpg"}
 YOU KNOW WHAT'S BADASS? When someone continues improving a product well after they've collected your money, and makes the updates available to you super easily. Hats off to @robconery and The Imposter's Handbook. Awesome demonstration of character.
 ::
-::testimonial-small{name="Rachel Kelly" image="rachel_kelly.jpg"}
-HOOOOO THE IMPOSTER'S HANDBOOK IS SO GOOD. IT'S SO GOOD. Loving learning about NP(~etc) problems!
-::
 
 </div>
 

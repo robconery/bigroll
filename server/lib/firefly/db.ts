@@ -1,9 +1,7 @@
-import dotenv from 'dotenv';
-import * as admin from 'firebase-admin';
+import admin from 'firebase-admin';
 import assert from 'assert';
 import "dotenv/config";
 
-dotenv.config();
 
 interface FirebaseConfig {
   credential: admin.credential.Credential;
@@ -25,6 +23,9 @@ const config: FirebaseConfig = {
   } as admin.ServiceAccount),
 };
 
+admin.initializeApp(config);
+
+
 class DB {
   fb: admin.firestore.Firestore;
   storage: admin.storage.Storage;
@@ -32,7 +33,7 @@ class DB {
 
     assert(process.env.FIREBASE_PRIVATE_KEY, "FIREBASE_PRIVATE_KEY is not set");
     assert(process.env.FIREBASE_CLIENT_EMAIL, "FIREBASE_CLIENT_EMAIL is not set");
-    admin.initializeApp(config);
+  
     this.fb = admin.firestore();
     this.storage = admin.storage();
   }

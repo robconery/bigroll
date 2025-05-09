@@ -1,18 +1,24 @@
 <template>
   <div class="card shadow h-100 card-hover">
     <div class="rounded-top overflow-hidden">
-      <img :src="image" class="card-img-top" alt="course image" />
+      <NuxtLink :to="course.path" class="stretched-link">
+        <img
+          :src="`/images/slides/${course.slug}.jpg`"
+          class="card-img-top"
+          alt="course image"
+        />
+      </NuxtLink>
     </div>
     <!-- Card body -->
-    <div class="card-body">
+    <div class="card-body" v-if="course.title">
       <!-- Title -->
       <h5 class="card-title">
-        <NuxtLink :to="link" class="stretched-link">
-          {{ title }}
+        <NuxtLink :to="course.path" class="stretched-link">
+          {{ course.title }}
         </NuxtLink>
       </h5>
       <!-- Content -->
-      <p>{{ summary }}</p>
+      <p>{{ course.description }}</p>
       <div v-if="$slots.default">
         <slot></slot>
       </div>
@@ -22,20 +28,8 @@
 
 <script setup lang="ts">
 defineProps({
-  image: {
-    type: String,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  summary: {
-    type: String,
-    required: true,
-  },
-  link: {
-    type: String,
+  course: {
+    type: Object,
     required: true,
   },
 });

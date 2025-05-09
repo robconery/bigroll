@@ -118,16 +118,18 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { isSignInWithEmailLink } from "firebase/auth";
 
 const {
+  user,
   sendSignInLinkToEmail,
   completeSignInWithEmailLink,
   loginWithGoogle,
   loginWithGithub,
   error,
   isLoading,
+  initAuthState,
 } = useFirebaseAuth();
 const email = ref("");
 const magicLinkSent = ref(false);
@@ -135,9 +137,29 @@ const isProcessingEmailLink = ref(false);
 const router = useRouter();
 const { $auth } = useNuxtApp();
 
+// Initialize the auth state observer
+initAuthState();
+
+// Redirect logged-in users to dashboard
+watch(
+  user,
+  (newUser) => {
+    if (newUser && !isProcessingEmailLink.value) {
+      router.push("/dashboard");
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(async () => {
   // Only run Firebase authentication code on the client side
-  if (!process.client) return;
+  if (!import.meta.client) return;
+
+  // If user is already logged in, redirect to dashboard
+  if (user.value && !isProcessingEmailLink.value) {
+    router.push("/dashboard");
+    return;
+  }
 
   // Check if the URL contains an email sign-in link
   if (isSignInWithEmailLink($auth, window.location.href)) {
@@ -158,8 +180,8 @@ onMounted(async () => {
         await completeSignInWithEmailLink(emailForSignIn);
         // Clear email from storage
         localStorage.removeItem("emailForSignIn");
-        // Redirect to dashboard or home page after successful sign-in
-        router.push("/");
+        // Redirect to dashboard after successful sign-in
+        router.push("/dashboard");
       } catch (err) {
         console.error("Error completing sign-in with email link:", err);
         // Reset the isProcessingEmailLink so the user can try again
@@ -170,7 +192,6 @@ onMounted(async () => {
     }
   }
 });
-
 const sendMagicLink = async () => {
   try {
     await sendSignInLinkToEmail(email.value);

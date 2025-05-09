@@ -307,7 +307,7 @@ const isGeneratingLink = ref(null);
 // Check if subscription is active (current_period_end is in the future)
 const isSubscriptionActive = computed(() => {
   if (!subscription.value) return false;
-  return subscription.value.isActive();
+  //return subscription.value.isActive();
 });
 
 // Process authorizations to get downloads
@@ -334,8 +334,8 @@ const courses = computed(() => {
     .filter((auth) => !auth.download || auth.download.trim() == "")
     .map((auth) => ({
       id: auth.id,
-      image: `/images/slides/${auth.sku}.jpg`,
-      sku: auth.sku,
+      slug: auth.sku,
+      path: `/courses/${auth.sku}`,
     }));
 });
 
