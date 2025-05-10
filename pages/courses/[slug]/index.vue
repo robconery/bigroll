@@ -51,10 +51,25 @@
             <!-- Title -->
             <div class="col-lg-7">
               <h3 class="text-white">You Have Access!</h3>
-              <p class="text-white mb-3 mb-lg-0">
+              <p class="text-white mb-0">
                 Feel free to look over the lessons below to find what you're
                 looking for, otherwise jump right in!
               </p>
+              <!-- Course progress -->
+              <div class="pt-3" v-if="completedCount > 0">
+                <CourseProgressBar
+                  :progress="courseProgress"
+                  :completedCount="completedCount"
+                  :totalLessons="lessons.length"
+                />
+                <p
+                  class="text-white mt-1 small"
+                  v-if="completedCount === lessons.length"
+                >
+                  <i class="fas fa-trophy text-warning me-1"></i> You've
+                  completed this course! Great job!
+                </p>
+              </div>
             </div>
             <!-- Content and input -->
             <div class="col-lg-5 text-lg-end">
@@ -100,6 +115,14 @@
       <!-- Row END -->
     </div>
 
+    <!-- Progress bar -->
+    <div v-if="hasAccess && lessons.length > 0" class="my-4">
+      <CourseProgressBar
+        :progress="courseProgress"
+        :completed="completedCount"
+      />
+    </div>
+
     <!-- Lessons grid -->
     <div class="row">
       <div
@@ -118,6 +141,18 @@
               class="card-img-top"
               alt="course image"
             />
+            <!-- Completed badge -->
+            <div
+              v-if="
+                hasAccess &&
+                completedLessons.some((cl) => cl.lessonSlug === lesson.slug)
+              "
+              class="position-absolute top-0 end-0 m-2"
+            >
+              <span class="badge bg-success rounded-pill">
+                <i class="fas fa-check"></i> Completed
+              </span>
+            </div>
           </NuxtLink>
           <!-- Card body -->
           <div class="card-body pb-0">
@@ -135,6 +170,15 @@
                 <i class="far fa-clock text-danger me-2"></i
                 >{{ $filters.duration(lesson.duration) }}
               </span>
+              <span
+                v-if="
+                  hasAccess &&
+                  completedLessons.some((cl) => cl.lessonSlug === lesson.slug)
+                "
+                class="text-success"
+              >
+                <i class="fas fa-check-circle"></i>
+              </span>
             </div>
           </div>
         </div>
@@ -144,6 +188,10 @@
 </template>
 
 <script setup>
+import { watchEffect } from "vue";
+import CourseProgressBar from "~/components/CourseProgressBar.vue";
+import { useFirestore } from "~/composables/useFirestore";
+
 const route = useRoute();
 const { slug } = route.params;
 
@@ -167,6 +215,37 @@ const { data: course } = await useAsyncData(`course-${slug}`, () => {
 // Fetch the lessons for this course
 const { data: lessons } = await useAsyncData(`lessons-${slug}`, () => {
   return queryCollection("lessons").where("course", "=", slug).all();
+});
+
+// Use the lesson progress functions from useFirestore
+const { getCompletedLessons, getCourseProgress } = useFirestore();
+
+// Progress tracking state
+const completedLessons = ref([]);
+const courseProgress = ref(0);
+const completedCount = ref(0);
+
+// Track progress when user and course are available
+watchEffect(async () => {
+  if (user.value?.uid && course.value?.slug && lessons.value?.length) {
+    try {
+      // Get all completed lessons for this course
+      const completed = await getCompletedLessons(user.value.uid);
+      completedLessons.value = completed.filter(
+        (item) => item.courseSlug === course.value.slug
+      );
+      completedCount.value = completedLessons.value.length;
+
+      // Calculate course progress
+      courseProgress.value = await getCourseProgress(
+        user.value.uid,
+        course.value.slug,
+        lessons.value.length
+      );
+    } catch (error) {
+      console.error("Error fetching course progress:", error);
+    }
+  }
 });
 
 useHead({

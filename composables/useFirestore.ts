@@ -6,13 +6,18 @@ import {
   query,
   where,
   orderBy,
+  addDoc,
+  deleteDoc,
+  Timestamp,
   type DocumentData,
   type Firestore,
   type QuerySnapshot
 } from 'firebase/firestore'
+import { ref } from 'vue'
 
 export const useFirestore = () => {
   const { $firestore } = useNuxtApp()
+  const isLoading = ref(false)
   
   /**
    * Get user data from Firestore by email
@@ -182,12 +187,268 @@ export const useFirestore = () => {
     }
   }
 
+  /**
+   * Get lesson progress for a user by uid
+   * @param uid User's Firebase Auth UID
+   * @returns Array of lesson progress data
+   */
+  const getLessonProgressByUid = async (uid: string): Promise<any[]> => {
+    try {
+      const firestore = $firestore as Firestore
+      const progressRef = collection(firestore, 'lessonProgress')
+      const q = query(progressRef, where('uid', '==', uid))
+      
+      const querySnapshot = await getDocs(q)
+      
+      const progress: any[] = []
+      querySnapshot.forEach((doc) => {
+        const progressData = doc.data()
+        // Return raw data with ID added
+        progress.push({
+          id: doc.id,
+          ...progressData
+        });
+      })
+      return progress
+    } catch (error) {
+      console.error('Error getting lesson progress by email:', error)
+      return []
+    }
+  }
+
+  /**
+   * Add lesson progress for a user
+   * @param uid User's Firebase Auth UID
+   * @param lessonId Lesson ID
+   * @param progress Progress data
+   * @returns The added progress data
+   */
+  const addLessonProgress = async (uid: string, lessonId: string, progress: any): Promise<any> => {
+    try {
+      const firestore = $firestore as Firestore
+      const progressRef = collection(firestore, 'lessonProgress')
+      const newProgress = {
+        uid,
+        lessonId,
+        progress,
+        createdAt: Timestamp.now()
+      }
+      const docRef = await addDoc(progressRef, newProgress)
+      return {
+        id: docRef.id,
+        ...newProgress
+      }
+    } catch (error) {
+      console.error('Error adding lesson progress:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Delete lesson progress for a user
+   * @param progressId Progress document ID
+   * @returns void
+   */
+  const deleteLessonProgress = async (progressId: string): Promise<void> => {
+    try {
+      const firestore = $firestore as Firestore
+      const progressDocRef = doc(firestore, 'lessonProgress', progressId)
+      await deleteDoc(progressDocRef)
+    } catch (error) {
+      console.error('Error deleting lesson progress:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get all completed lessons for a user
+   * 
+   * @param uid The user's Firebase Auth UID
+   * @returns Array of completed lesson objects
+   */
+  const getCompletedLessons = async (uid: string) => {
+    if (!uid) return []
+
+    try {
+      isLoading.value = true
+      const firestore = $firestore as Firestore
+      const q = query(
+        collection(firestore, 'progress'),
+        where('uid', '==', uid)
+      )
+      
+      const snapshot = await getDocs(q)
+      const completedLessons = snapshot.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data()
+        }
+      })
+      
+      return completedLessons
+    } catch (error) {
+      console.error('Error fetching completed lessons:', error)
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Check if a specific lesson is completed
+   * 
+   * @param uid The user's Firebase Auth UID
+   * @param courseSlug The course slug
+   * @param lessonSlug The lesson slug
+   * @returns Boolean indicating if lesson is completed
+   */
+  const isLessonCompleted = async (uid: string, courseSlug: string, lessonSlug: string) => {
+    if (!uid || !courseSlug || !lessonSlug) return false
+
+    try {
+      isLoading.value = true
+      const firestore = $firestore as Firestore
+      const q = query(
+        collection(firestore, 'progress'),
+        where('uid', '==', uid),
+        where('courseSlug', '==', courseSlug),
+        where('lessonSlug', '==', lessonSlug)
+      )
+      
+      const snapshot = await getDocs(q)
+      return !snapshot.empty
+    } catch (error) {
+      console.error('Error checking if lesson is completed:', error)
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Mark a lesson as completed
+   * 
+   * @param uid The user's Firebase Auth UID
+   * @param courseSlug The course slug
+   * @param lessonSlug The lesson slug
+   * @param lessonTitle The lesson title
+   * @returns The ID of the created progress document
+   */
+  const markLessonCompleted = async (uid: string, courseSlug: string, lessonSlug: string, lessonTitle: string) => {
+    if (!uid || !courseSlug || !lessonSlug) return null
+
+    try {
+      isLoading.value = true
+      const firestore = $firestore as Firestore
+      
+      // Check if it's already completed
+      const isCompleted = await isLessonCompleted(uid, courseSlug, lessonSlug)
+      if (isCompleted) return null
+      
+      const progressRef = await addDoc(collection(firestore, 'progress'), {
+        uid,
+        courseSlug,
+        lessonSlug,
+        lessonTitle,
+        completedAt: Timestamp.now()
+      })
+      
+      return progressRef.id
+    } catch (error) {
+      console.error('Error marking lesson as completed:', error)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Mark a lesson as not completed (remove completion status)
+   * 
+   * @param uid The user's Firebase Auth UID
+   * @param courseSlug The course slug
+   * @param lessonSlug The lesson slug
+   * @returns Boolean indicating success
+   */
+  const markLessonNotCompleted = async (uid: string, courseSlug: string, lessonSlug: string) => {
+    if (!uid || !courseSlug || !lessonSlug) return false
+
+    try {
+      isLoading.value = true
+      const firestore = $firestore as Firestore
+      
+      const q = query(
+        collection(firestore, 'progress'),
+        where('uid', '==', uid),
+        where('courseSlug', '==', courseSlug),
+        where('lessonSlug', '==', lessonSlug)
+      )
+      
+      const snapshot = await getDocs(q)
+      
+      if (snapshot.empty) return false
+      
+      // Delete all matching documents (should only be one, but being thorough)
+      const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref))
+      await Promise.all(deletePromises)
+      
+      return true
+    } catch (error) {
+      console.error('Error marking lesson as not completed:', error)
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Calculate the course progress percentage
+   * 
+   * @param uid The user's Firebase Auth UID
+   * @param courseSlug The course slug
+   * @param totalLessons The total number of lessons in the course
+   * @returns Progress percentage (0-100)
+   */
+  const getCourseProgress = async (uid: string, courseSlug: string, totalLessons: number) => {
+    if (!uid || !courseSlug || !totalLessons) return 0
+
+    try {
+      isLoading.value = true
+      const firestore = $firestore as Firestore
+      
+      const q = query(
+        collection(firestore, 'progress'),
+        where('uid', '==', uid),
+        where('courseSlug', '==', courseSlug)
+      )
+      
+      const snapshot = await getDocs(q)
+      const completedCount = snapshot.size
+      
+      return Math.round((completedCount / totalLessons) * 100)
+    } catch (error) {
+      console.error('Error calculating course progress:', error)
+      return 0
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     getUserByEmail,
     getAuthorizations,
     checkAuthorized,
     getOrdersByEmail,
     getOrderByNumber,
-    getSubscriptionByEmail
+    getSubscriptionByEmail,
+    getLessonProgressByUid,
+    addLessonProgress,
+    deleteLessonProgress,
+    getCompletedLessons,
+    isLessonCompleted,
+    markLessonCompleted,
+    markLessonNotCompleted,
+    getCourseProgress,
+    isLoading
   }
 }

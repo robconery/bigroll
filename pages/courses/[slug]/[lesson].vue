@@ -1,5 +1,19 @@
 <template>
   <div class="container-fluid position-relative" v-if="lesson && course">
+    <!-- Course progress bar -->
+    <div
+      v-if="user && isAuthorized"
+      class="course-progress-container py-2 bg-light sticky-top border-bottom mb-3"
+    >
+      <div class="container">
+        <CourseProgressBar
+          :progress="courseProgress"
+          :completedCount="completedCount"
+          :totalLessons="totalLessonsCount"
+        />
+      </div>
+    </div>
+
     <div class="row g-5">
       <!-- Sidebar -->
       <div class="col-lg-3 pb-lg-5">
@@ -56,6 +70,11 @@
                             :class="
                               lessonItem.free
                                 ? 'btn-success'
+                                : isAuthorized &&
+                                  completedLessons.some(
+                                    (cl) => cl.lessonSlug === lessonItem.slug
+                                  )
+                                ? 'btn-success'
                                 : isAuthorized
                                 ? 'btn-info'
                                 : 'btn-secondary'
@@ -67,8 +86,13 @@
                                   ? 'fas fa-play'
                                   : lessonItem.free
                                   ? 'fas fa-unlock'
-                                  : isAuthorized
+                                  : isAuthorized &&
+                                    completedLessons.some(
+                                      (cl) => cl.lessonSlug === lessonItem.slug
+                                    )
                                   ? 'fas fa-check'
+                                  : isAuthorized
+                                  ? 'far fa-circle'
                                   : 'fas fa-lock'
                               "
                             ></i>
@@ -148,16 +172,21 @@
         <!-- Navigation buttons -->
         <div class="col-12">
           <div class="row my-4">
-            <div class="col-2">
+            <div class="col d-flex align-items-center">
+              <!-- Completed toggle button - positioned under video -->
               <button
                 v-if="user && isAuthorized"
                 @click="toggleCompleted"
-                class="btn outline px-3 py-2 btn-lg"
+                class="btn outline px-3 py-2 btn-lg me-2"
                 :class="
                   isLessonCompleted ? 'btn-success' : 'btn-outline-success'
                 "
               >
-                <i class="fas fa-check me-0"></i>
+                <i
+                  class="fas fa-check me-0"
+                  :class="isLessonCompleted ? 'me-2' : 'me-0'"
+                ></i>
+                <span v-if="isLessonCompleted">Completed</span>
               </button>
             </div>
             <div class="col text-end">
@@ -216,14 +245,32 @@ const { slug, lesson: lessonSlug } = route.params;
 // Get auth state
 const { user, authorizations } = useFirebaseAuth();
 
+// Import Vue utilities
+import { watchEffect } from "vue";
+
+// Import components
+import CourseProgressBar from "~/components/CourseProgressBar.vue";
+
+// Import progress tracking functions from useFirestore
+const {
+  isLessonCompleted: checkLessonCompleted,
+  markLessonCompleted,
+  markLessonNotCompleted,
+  getCourseProgress,
+  getCompletedLessons,
+} = useFirestore();
+
+// Import confetti
+const { triggerConfetti } = useConfetti();
+
 // Fetch the course data
 const { data: course } = await useAsyncData(`course-${slug}`, () => {
-  return queryCollection("courses").where("slug", "=", slug).first();
+  return queryCollection("courses").where("slug", "==", slug).first();
 });
 
 // Fetch all lessons for this course
 const { data: lessons } = await useAsyncData(`lessons-${slug}`, () => {
-  return queryCollection("lessons").where("course", "=", slug).all();
+  return queryCollection("lessons").where("course", "==", slug).all();
 });
 
 // Get the current lesson data
@@ -238,20 +285,91 @@ const isAuthorized = computed(() => {
     authorizations.value.some((auth) => auth.sku === course.value.slug)
   );
 });
+
+// Lesson completion state
 const isLessonCompleted = ref(false);
-// Check authorization when user or course changes
-// watch(
-//   [user, course],
-//   ([currentUser, currentCourse]) => {
-//     if (currentUser && currentCourse) {
-//       // Simply use the authStore's isAuthorizedForSku method
-//       isAuthorized.value = isAuthorizedForSku(currentCourse.slug);
-//     } else {
-//       isAuthorized.value = false;
-//     }
-//   },
-//   { immediate: true }
-// );
+const completedLessons = ref([]);
+const courseProgress = ref(0);
+const completedCount = ref(0);
+
+// Calculate total lessons count
+const totalLessonsCount = computed(() => {
+  return lessons.value?.length || 0;
+});
+
+// Check if current lesson is completed when user, course or lesson changes
+watchEffect(async () => {
+  if (user.value?.uid && course.value?.slug && lesson.value?.slug) {
+    // Check if this lesson is completed
+    isLessonCompleted.value = await checkLessonCompleted(
+      user.value.uid,
+      course.value.slug,
+      lesson.value.slug
+    );
+
+    // Get all completed lessons for this course
+    const completed = await getCompletedLessons(user.value.uid);
+    completedLessons.value = completed.filter(
+      (item) => item.courseSlug === course.value.slug
+    );
+    completedCount.value = completedLessons.value.length;
+
+    // Calculate course progress
+    courseProgress.value = await getCourseProgress(
+      user.value.uid,
+      course.value.slug,
+      totalLessonsCount.value
+    );
+  }
+});
+
+// Toggle completion status of current lesson
+const toggleCompleted = async () => {
+  if (!user.value?.uid || !course.value?.slug || !lesson.value?.slug) return;
+
+  try {
+    if (isLessonCompleted.value) {
+      // If already completed, mark as not completed
+      await markLessonNotCompleted(
+        user.value.uid,
+        course.value.slug,
+        lesson.value.slug
+      );
+      isLessonCompleted.value = false;
+    } else {
+      // If not completed, mark as completed
+      await markLessonCompleted(
+        user.value.uid,
+        course.value.slug,
+        lesson.value.slug,
+        lesson.value.title
+      );
+      isLessonCompleted.value = true;
+
+      // Trigger confetti animation
+      triggerConfetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.5 },
+      });
+    }
+
+    // Recalculate course progress
+    const completed = await getCompletedLessons(user.value.uid);
+    completedLessons.value = completed.filter(
+      (item) => item.courseSlug === course.value.slug
+    );
+    completedCount.value = completedLessons.value.length;
+
+    courseProgress.value = await getCourseProgress(
+      user.value.uid,
+      course.value.slug,
+      totalLessonsCount.value
+    );
+  } catch (error) {
+    console.error("Error toggling lesson completion:", error);
+  }
+};
 
 // Group lessons by category
 const lessonsByCategory = computed(() => {
