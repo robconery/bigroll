@@ -29,8 +29,6 @@ export const useFirebaseAuth = () => {
 
   // Initialize Firebase auth state observer if not already initialized
   const initAuthState = () => {
-    //No errors please from server nonsense
-    if (import.meta.server) return;
     if (authStateInitialized) return
     
     console.log('Initializing auth state observer')

@@ -18,11 +18,6 @@
                 alt="User avatar"
               />
             </div>
-            <div>
-              <h1 class="mb-2">
-                {{ userModel?.name || user?.displayName || user?.email }}
-              </h1>
-            </div>
           </div>
 
           <div class="col-md-6 col-lg-12">
@@ -82,6 +77,58 @@
       <!-- Main content START -->
       <div class="col-lg-8">
         <!-- Title -->
+        <h5 class="mb-0">🤙🏼</h5>
+        <h1 class="mb-2">
+          {{ userModel?.name || user?.displayName || user?.email }}
+        </h1>
+
+        <!-- Profile update form -->
+        <p>
+          Changing your details here will change them across the site, including
+          your orders.
+        </p>
+        <form @submit.prevent="updateProfile" class="row g-4">
+          <div class="input-group input-group-lg">
+            <span
+              class="input-group-text bg-light rounded-start border-0 text-secondary px-3"
+            >
+              <i class="bi bi-person-bounding-box"></i>
+            </span>
+            <input
+              v-model="profile.name"
+              name="name"
+              class="form-control border-0 bg-light rounded-end ps-1"
+              placeholder="Your Name"
+            />
+          </div>
+
+          <div class="input-group input-group-lg">
+            <span
+              class="input-group-text bg-light rounded-start border-0 text-secondary px-3"
+            >
+              <i class="bi bi-envelope-fill"></i>
+            </span>
+            <input
+              v-model="profile.email"
+              name="email"
+              type="email"
+              class="form-control border-0 bg-light rounded-end ps-1"
+              placeholder="E-mail"
+              id="exampleInputEmail1"
+            />
+          </div>
+
+          <!-- Save button -->
+          <div class="d-sm-flex">
+            <button
+              type="submit"
+              class="btn btn-primary mb-0"
+              :disabled="isUpdating"
+            >
+              {{ isUpdating ? "Updating..." : "Update Profile" }}
+            </button>
+          </div>
+        </form>
 
         <!-- Subscription section for active subscribers -->
         <div
@@ -275,7 +322,8 @@ const downloads = computed(() => {
       description: `Download for ${auth.sku}`,
       image: `/images/slides/${auth.sku}.jpg`,
       download: auth.download,
-      sku: auth.sku, // Store the full authorization object for easier access
+      sku: auth.sku,
+      authorizationObj: auth, // Store the full authorization object for easier access
     }));
 });
 
@@ -297,7 +345,7 @@ const generateDownloadLink = async (item) => {
     isGeneratingLink.value = item.id;
 
     // Check if we have a valid download URL
-    if (!item.download) {
+    if (!item.authorizationObj) {
       alert("Download information not available.");
       return;
     }
