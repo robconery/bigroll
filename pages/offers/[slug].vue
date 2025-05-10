@@ -7,7 +7,7 @@ const { data: document } = await useAsyncData(`offers-${slug}`, () => {
 </script>
 
 <template>
-  <div class="container-fluid mx-auto p-0 py-8" style="min-height: 500px">
+  <div class="container-fluid mx-auto p-0 pt-lg-6" style="min-height: 500px">
     <ContentRenderer v-if="document" :value="document" />
     <div v-else>Loading content...</div>
   </div>

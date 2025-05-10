@@ -14,6 +14,9 @@
 
       <div class="col-md-5 position-relative z-index-9 px-4">
         <slot></slot>
+        <p v-if="link">
+          <BigButton :text="buttonText" :link="link" class="mt-4" />
+        </p>
       </div>
     </div>
   </div>
@@ -26,6 +29,14 @@ defineProps({
     default: false,
   },
   image: {
+    type: String,
+    default: null,
+  },
+  link: {
+    type: String,
+    default: null,
+  },
+  buttonText: {
     type: String,
     default: null,
   },

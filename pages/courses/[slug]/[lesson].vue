@@ -43,44 +43,53 @@
                     <div
                       v-for="lessonItem in categoryLessons"
                       :key="lessonItem.slug"
-                      class="d-flex justify-content-between align-items-center p-2 rounded-2"
+                      class="d-flex align-items-start p-2 rounded-2"
                       :class="lesson.slug === lessonItem.slug ? 'bg-light' : ''"
                     >
-                      <div class="position-relative d-flex align-items-center">
-                        <NuxtLink
-                          :to="`/courses/${course.slug}/${lessonItem.slug}`"
-                          class="btn btn-round btn-sm mb-0 stretched-link position-static"
-                          :class="
-                            lessonItem.free
-                              ? 'btn-success'
-                              : isAuthorized
-                              ? 'btn-info'
-                              : 'btn-secondary'
-                          "
-                        >
-                          <i
-                            :class="
-                              lesson.slug === lessonItem.slug
-                                ? 'fas fa-play'
-                                : lessonItem.free
-                                ? 'fas fa-unlock'
-                                : isAuthorized
-                                ? 'fas fa-check'
-                                : 'fas fa-lock'
-                            "
-                          ></i>
-                        </NuxtLink>
-                        <span class="d-inline-block ms-2 mb-0 h6 fw-light">{{
-                          lessonItem.title
-                        }}</span>
-                      </div>
-                      <p
-                        class="mb-0 text-caption"
-                        style="font-size: 0.8em"
-                        v-if="lessonItem.duration"
+                      <NuxtLink
+                        :to="`/courses/${course.slug}/${lessonItem.slug}`"
+                        class="d-flex align-items-start text-decoration-none w-100"
                       >
-                        {{ $filters.duration(lessonItem.duration) }}
-                      </p>
+                        <div class="me-2">
+                          <span
+                            class="btn btn-round btn-sm mb-0 d-flex align-items-center justify-content-center"
+                            :class="
+                              lessonItem.free
+                                ? 'btn-success'
+                                : isAuthorized
+                                ? 'btn-info'
+                                : 'btn-secondary'
+                            "
+                          >
+                            <i
+                              :class="
+                                lesson.slug === lessonItem.slug
+                                  ? 'fas fa-play'
+                                  : lessonItem.free
+                                  ? 'fas fa-unlock'
+                                  : isAuthorized
+                                  ? 'fas fa-check'
+                                  : 'fas fa-lock'
+                              "
+                            ></i>
+                          </span>
+                        </div>
+                        <div class="flex-grow-1">
+                          <div
+                            class="fw-light text-body"
+                            style="font-size: medium; line-height: 1.2"
+                          >
+                            {{ lessonItem.title }}
+                          </div>
+                          <div
+                            v-if="lessonItem.duration"
+                            class="text-muted mt-1"
+                            style="font-size: small"
+                          >
+                            {{ $filters.duration(lessonItem.duration) }}
+                          </div>
+                        </div>
+                      </NuxtLink>
                     </div>
                   </div>
                 </div>
@@ -180,6 +189,10 @@
         </div>
 
         <!-- Lesson content -->
+        <p class="lead">
+          {{ lesson.summary }}
+        </p>
+        <hr />
         <div v-if="lesson.gist" class="mx-auto">
           <div class="gist-embed" :data-gist-id="lesson.gist"></div>
         </div>

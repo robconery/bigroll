@@ -1,7 +1,7 @@
 <template>
   <div class="col-md-6 col-xl-4">
     <div class="card p-2 shadow h-100 card-hover">
-      <div class="rounded-top overflow-hidden">
+      <div class="rounded-top overflow-hidden" v-if="image">
         <div class="">
           <!-- Image -->
           <img :src="image" class="card-img-top" alt="course image" />
@@ -11,7 +11,7 @@
       <div class="card-body">
         <!-- Rating and avatar -->
         <!-- Divider -->
-        <hr />
+        <hr v-if="image" />
         <!-- Title -->
         <h5 class="card-title" v-if="title">
           {{ title }}

@@ -32,6 +32,15 @@
           <span class="mb-0 fs-1">👋</span>
           <h1 class="fs-2">Welcome!</h1>
 
+          <!-- Email update notification from query parameter -->
+          <div
+            v-if="route.query.message"
+            class="alert alert-info mb-4"
+            role="alert"
+          >
+            {{ route.query.message }}
+          </div>
+
           <div v-if="error" class="alert alert-danger" role="alert">
             {{ error }}
           </div>
@@ -54,6 +63,10 @@
                   id="email"
                   placeholder="E-mail"
                   v-model="email"
+                  :class="{
+                    'is-valid':
+                      route.query.email && email === route.query.email,
+                  }"
                   required
                 />
               </div>
@@ -131,14 +144,15 @@ const {
   isLoading,
   initAuthState,
 } = useFirebaseAuth();
-const email = ref("");
+const route = useRoute();
+const email = ref(route.query.email?.toString() || "");
 const magicLinkSent = ref(false);
 const isProcessingEmailLink = ref(false);
 const router = useRouter();
 const { $auth } = useNuxtApp();
 
 // Initialize the auth state observer
-initAuthState();
+//initAuthState();
 
 // Redirect logged-in users to dashboard
 watch(
