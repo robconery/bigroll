@@ -2,6 +2,7 @@ import "dotenv/config"
 import { Order } from '../models'
 import { defineEventHandler, readBody, createError, getHeader } from 'h3'
 import Stripe from 'stripe'
+import { getCheckoutSession } from "../lib/stripe"
 
 
 // Initialize Stripe with the API key
@@ -41,13 +42,13 @@ export default defineEventHandler(async (event) => {
   // Handle the checkout.completed event
   if (stripeEvent && stripeEvent.type === 'checkout.session.completed') {
     try {
-      const session = stripeEvent.data.object as Stripe.Checkout.Session
-      
+      //const session = stripeEvent.data.object as Stripe.Checkout.Session
+      const session = getCheckoutSession(stripeEvent.data.object.id);
       // Ensure we have a valid session with the necessary data
-      if (!session.customer_email && !session.customer_details?.email || session.payment_status !== 'paid') {
-        out.statusMessage = 'Invalid or unpaid session data'
-        return out;
-      }
+      // if (!session.customer_email && !session.customer_details?.email || session.payment_status !== 'paid') {
+      //   out.statusMessage = 'Invalid or unpaid session data'
+      //   return out;
+      // }
       
       // The updated Order.saveStripeOrder method only needs the session parameter
       await Order.saveStripeOrder(session);
