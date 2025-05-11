@@ -84,79 +84,66 @@ export class Order extends Firefly<Order> {
 
   static async saveStripeOrder(session: any): Promise<[Order, Authorization[]]> {
     //ensure we have a customer and id using assert
+    assert(session.customer_details, 'No customer details');
     assert(session.customer_details.email, 'Missing customer email in session');
     assert(session.id, 'Missing session ID');
     
-    //we need to be sure we have a sku or slug for an offer
-    const slug = session.metadata.sku || session.metadata.slug;
-    assert(slug, 'Missing sku or slug in session metadata');
-
-    //now make sure we have an offer
-    const offer = await Offer.find({ slug });
-
-    assert(offer, `Offer not found for ${slug}`);
-
-    // Generate a unique order number
+ // Generate a unique order number
     const orderNumber = `RED4-${session.id.slice(-8)}`;
     
     // We've already validated that customer_email exists before calling this method
-    const customerEmail = session.customer_details.email.toLowerCase();
+    const customerEmail = session.customer_details.email;
+    //const customerEmail = session.customer_details.email.toLowerCase();
     
     // Create the order object using the Order class
     const newOrder = new Order({
+      id: orderNumber,
       number: orderNumber,
       date: new Date().toISOString(),
       email: customerEmail,
       name: session.customer_details?.name || '',
-      slug: session.metadata.slug || session.metadata.sku,
-      offer: session.metadata.name,
       store: 'stripe',
       total: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
       status: 'pending'
     });
     await newOrder.save();
     const authorizations: Authorization[] = [];
-    //there might be a file on the metadata
-    const file = session.metadata.file || '';
-    if (file) {
-      const authorization = new Authorization({
-        email: customerEmail,
-        sku: newOrder.slug,
-        date: newOrder.date,
-        order: orderNumber,
-        offer: newOrder.offer,
-        download: file
-      });
-      await authorization.save();
-      authorizations.push(authorization);
-    } else {
-      //get the offer
-      const offer = await Offer.find({ slug: newOrder.slug });
-      if (!offer) {
-        console.error(`Offer not found for Stripe ID: ${orderNumber}`);
-        return [newOrder, []];
-      }
-      //get the products for the offer
-      const products = await offer.getProducts();
-      if (!products || products.length === 0) {
-        console.error(`No products found for offer: ${offer.slug}`);
-        return [newOrder, []];
-      }
-      //authorize each product in the order
-      for (const product of products) {
+
+    //loop the line_items and get the product metadata
+    for (const item of session.line_items.data) {
+      const product = item.price.product;
+      const metadata = product.metadata || {};
+      const sku = metadata.sku || metadata.slug;
+      const file = metadata.file || null;
+      if (sku) {
         const authorization = new Authorization({
           email: customerEmail,
-          sku: product.sku,
+          sku: sku,
+          download: file,
+          name: product.name,
           date: newOrder.date,
           order: orderNumber,
-          offer: offer.slug
+          offer: sku
         });
+
         await authorization.save();
+        if (file) {
+          const downloadUrl = await authorization.getDownloadUrl();
+          if (downloadUrl) {
+            authorization.link = downloadUrl;
+          }
+        }
+
         authorizations.push(authorization);
       }
     }
+    
+    newOrder.offer = authorizations.map(auth => auth.name).join(', ');
+    newOrder.slug = authorizations.map(auth => auth.sku).join(', ');
     newOrder.status = 'completed';
+    
     await newOrder.save();
+
     return [newOrder, authorizations];
   }
 }

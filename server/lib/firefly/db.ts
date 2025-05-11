@@ -25,7 +25,15 @@ const config: FirebaseConfig = {
 
 admin.initializeApp(config);
 
-
+export const getStorageUrl = async (path: string): Promise<string> => {
+  const bucket = admin.storage().bucket("project-8588976765518720764.appspot.com");
+  const file = bucket.file(path);
+  const [url] = await file.getSignedUrl({
+    action: 'read',
+    expires: Date.now() + 1000 * 60 * 60 * 24, // 1 day
+  });
+  return url;
+};
 class DB {
   fb: admin.firestore.Firestore;
   storage: admin.storage.Storage;

@@ -2,11 +2,14 @@ import 'dotenv/config';
 import Stripe from 'stripe';
 import { H3Event, readRawBody, getHeader } from "h3";
 import { createError } from 'h3';
-
+import { Order } from '../models/';
 // Initialize Stripe with the API key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2022-11-15' // Use appropriate API version
-});
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey) {
+  throw new Error('Stripe secret key is not defined in environment variables');
+}
+
+const stripe = new Stripe(stripeKey);
 
 export const searchCustomers = async (query: string) => {
   try {
@@ -72,6 +75,23 @@ export const getInvoice = async (id: string) => {
   }
 }
 
+export async function getCheckoutSession(sessionId: string) {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items', 'line_items.data.price.product']
+    });
+    if (!session) {
+      throw new Error('Session not found');
+    }
+    return session;
+  } catch (error: any) {
+    console.error('Error retrieving checkout session:', error);
+    return {
+      error: error.message || 'Failed to retrieve checkout session'
+    };
+  }
+}
+    // Get the product information from the first line item
 /**
  * Get details of a checkout session from Stripe
  * @param sessionId The ID of the Stripe checkout session
@@ -82,7 +102,9 @@ export async function getCheckout(sessionId: string) {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'line_items.data.price.product']
     });
-
+    if (!session) {
+      throw new Error('Session not found');
+    }
     // Extract product information from the session
     let product = null;
     let metadata = null;
@@ -96,7 +118,7 @@ export async function getCheckout(sessionId: string) {
       }
     }
 
-    return {
+    const out = {
       id: session.id,
       customer_email: session.customer_details?.email || session.customer_email,
       customer_name: session.customer_details?.name || '',
@@ -111,6 +133,12 @@ export async function getCheckout(sessionId: string) {
         metadata: metadata
       }
     };
+    if (session.customer_details) {
+      out.customer_email = session.customer_details?.email || session.customer_email
+    } else {
+      out.customer_email = session.customer_email
+    }
+    return out;
   } catch (error: any) {
     console.error('Error retrieving checkout session:', error);
     return {

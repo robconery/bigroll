@@ -148,6 +148,12 @@ export class Firefly<T extends Firefly<T>> {
    * This replaces the toFirestore method in individual models
    */
   protected _toFirestore(): Record<string, any> {
+    if (this.storage) {
+      delete this.storage; // Remove the storage property if it exists
+    }
+    if (this.link) {
+      delete this.link; // Remove the link property if it exists
+    }
     // Create a plain object copy without any methods
     const json = JSON.stringify(this);
     const data = JSON.parse(json);
@@ -156,11 +162,7 @@ export class Firefly<T extends Firefly<T>> {
     if (data.email) {
       data.email = data.email.toLowerCase();
     }
-    
-    // Don't store runtime-only properties in Firestore
-    // Common runtime properties that shouldn't be stored
-    delete data.link; // Often used for download URLs and other transient data
-    
+
     return data;
   }
 }
