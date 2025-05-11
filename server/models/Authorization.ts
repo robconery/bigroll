@@ -30,9 +30,11 @@ export class Authorization extends Firefly<Authorization> {
       return null;
     }
     let storagePath = this.download
-    
+    const storage = getStorage();
+    const bucket = storage.bucket('project-8588976765518720764.appspot.com'); // Replace with your actual bucket name
+    const storageRef = bucket.file(storagePath);
     // Create a reference from the storage path
-    const storageRef = this.storage.bucket().file(storagePath)
+    //const storageRef = this.storage.bucket().file(storagePath)
     try {
       // Generate a signed URL that expires in 2 hours (7200 seconds)
       const signedUrl = await getDownloadURL(storageRef)
