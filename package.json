@@ -10,8 +10,7 @@
     "postinstall": "nuxt prepare",
     "deploy": "nuxt build && firebase deploy",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "postbuild": "cp .env .output/server/.env"
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@nuxt/content": "^3.5.1",
