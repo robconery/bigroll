@@ -161,11 +161,7 @@
                 <img :src="book.image" class="img-fluid" :alt="book.title" />
                 <div
                   class="card-img-overlay d-flex align-items-start flex-column p-3"
-                >
-                  <div class="w-100 mt-auto">
-                    <span class="badge bg-primary mb-2">{{ book.price }}</span>
-                  </div>
-                </div>
+                ></div>
               </div>
               <div class="card-body pb-0">
                 <h5 class="card-title">
