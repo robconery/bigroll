@@ -24,7 +24,7 @@ export class Authorization extends Firefly<Authorization> {
     //override the id to be email-sku
     this.id = `${this.email}-${this.sku}`;
   }
-
+  
   async getDownloadUrl(): Promise<string | null> {
     if (!this.download) {
       return null;

@@ -29,7 +29,8 @@ export async function sendEmailWithDownloads(email: string) {
   
   let downloadLinks = []
   for (let d of downloads) {
-    downloadLinks.push(`<li><a href="${d.getDownloadUrl()}">${d.download}</a></li>`)
+    const link = await d.getDownloadUrl();
+    downloadLinks.push(`<li><a href="${link}">${d.download}</a></li>`)
   }
   const linkHtml = downloadLinks.join('\n')
   //const linkHtml = "";
