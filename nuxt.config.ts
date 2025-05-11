@@ -1,8 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
   modules: ['@nuxt/content', '@nuxt/scripts'],
+  nitro: {
+    firebase: {
+      gen: 2
+    }
+  },
   vite: {
     build: {
       rollupOptions: {
@@ -20,6 +24,9 @@ export default defineNuxtConfig({
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY,
     },
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
   },
   
   // Register global middleware for authentication

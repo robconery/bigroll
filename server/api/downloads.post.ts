@@ -12,15 +12,19 @@ export default defineEventHandler(async (event) => {
   try {
 
     const { email } = await readBody(event)
-
+    //console.log('Sending downloads to:', email)
     if (!email) {
       out.body.message = 'Email is required'
+      //return a 500 error
+      out.statusCode = 500
+    } else {
+          // Use the centralized email module
+      await sendEmailWithDownloads(email)
+      out.body.message = 'Download links have been sent to your email!'
+      out.statusCode = 200
     }
 
-    // Use the centralized email module
-    //await sendEmailWithDownloads(email)
-    out.body.message = 'Download links have been sent to your email!'
-    out.statusCode = 200
+
     
   } catch (error) {
     console.error('Error processing download request:', error)

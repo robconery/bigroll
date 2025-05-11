@@ -193,76 +193,6 @@
         </div>
 
         <!-- Courses section -->
-        <div class="row mt-lg-6 mb-4">
-          <div class="col-lg-8 mx-auto text-center">
-            <h2 class="fs-1">Radical Courses</h2>
-            <p class="mb-0 lead">
-              I started doing online technical content in 2005 which led me to
-              founding Tekpub.com in 2009. This is what I'm good at.
-            </p>
-          </div>
-        </div>
-
-        <!-- Courses cards -->
-        <div class="row g-4">
-          <div
-            v-for="course in courses"
-            :key="course._path"
-            class="col-sm-6 col-lg-4"
-          >
-            <div class="card card-hover-shadow h-100 border-0 rounded-4 shadow">
-              <div
-                class="card-img-top overflow-hidden rounded-top-4 position-relative"
-              >
-                <img
-                  :src="course.image"
-                  class="img-fluid"
-                  :alt="course.title"
-                />
-                <div
-                  class="card-img-overlay d-flex align-items-start flex-column p-3"
-                >
-                  <div class="w-100 d-flex justify-content-between">
-                    <span class="badge bg-danger mb-2">{{
-                      course.access
-                    }}</span>
-                    <span class="badge bg-info mb-2">{{
-                      course.category
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body pb-0">
-                <h5 class="card-title">
-                  <a
-                    :href="`/courses/${course.slug}`"
-                    class="stretched-link text-decoration-none"
-                    >{{ course.title }}</a
-                  >
-                </h5>
-                <p class="card-text mb-3">{{ course.summary }}</p>
-              </div>
-              <div class="card-footer pt-0 border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <span class="me-2"
-                      ><i class="fas fa-clock"></i> {{ course.duration }}</span
-                    >
-                    <span
-                      ><i class="fas fa-video"></i>
-                      {{ course.videoCount }} videos</span
-                    >
-                  </div>
-                  <a
-                    :href="`/courses/${course.slug}`"
-                    class="btn btn-sm btn-outline-primary mt-2"
-                    >View course</a
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   </div>
@@ -274,12 +204,8 @@ const { data: books } = await useAsyncData("books-list", () => {
   return queryCollection("books").all();
 });
 
-const { data: courses } = await useAsyncData("courses-list", () => {
-  return queryCollection("courses").all();
-});
-
 useHead({
-  title: "Welcome",
+  title: "A Home for Self-Taught Programmers",
   meta: [
     {
       name: "description",

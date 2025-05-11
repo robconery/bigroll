@@ -37,44 +37,9 @@
             <!-- Nav Search END -->
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
               <li class="nav-item">
-                <NuxtLink class="nav-link" to="/courses/">Courses</NuxtLink>
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  >Books</a
+                <NuxtLink class="nav-link" to="/downloads"
+                  >Find Your Downloads</NuxtLink
                 >
-                <ul class="dropdown-menu" aria-labelledby="accounntMenu">
-                  <li>
-                    <a class="dropdown-item" href="/offers/imposter-second"
-                      >The Imposter's Handbook</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="/offers/roadmap"
-                      >The Imposter's Roadmap</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="/offers/curious-moon"
-                      >A Curious Moon</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="https://www.troyhunt.com/pwned-the-book-is-now-available-for-free/"
-                      >PWNED!</a
-                    >
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <NuxtLink class="nav-link" to="/downloads">Downloads</NuxtLink>
               </li>
               <li class="nav-item">
                 <NuxtLink class="nav-link" to="/posts">Posts</NuxtLink>

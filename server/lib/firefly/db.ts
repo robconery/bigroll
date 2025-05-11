@@ -16,8 +16,8 @@ interface WhereClause {
 const config: FirebaseConfig = {
   //check to ensure the environment variables are set
   credential: admin.credential.cert({
-    private_key: process.env.FIREBASE_PRIVATE_KEY,
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: process.env.FB_PRIVATE_KEY,
+    client_email: process.env.FB_CLIENT_EMAIL,
     projectId: "project-8588976765518720764",
     storageBucket: "project-8588976765518720764.appspot.com",
   } as admin.ServiceAccount),
@@ -30,9 +30,6 @@ class DB {
   fb: admin.firestore.Firestore;
   storage: admin.storage.Storage;
   constructor() {
-
-    assert(process.env.FIREBASE_PRIVATE_KEY, "FIREBASE_PRIVATE_KEY is not set");
-    assert(process.env.FIREBASE_CLIENT_EMAIL, "FIREBASE_CLIENT_EMAIL is not set");
   
     this.fb = admin.firestore();
     this.storage = admin.storage();
