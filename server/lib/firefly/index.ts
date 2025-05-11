@@ -21,10 +21,12 @@ export class Firefly<T extends Firefly<T>> {
   id!: string; // Using the non-null assertion operator to fix initialization error
   created_at!: string;
   timestamp!: number;
+
   [key: string]: any;
 
   static async update<T extends Firefly<T>>(this: { new(data: any): T }, id: string | number, data: any): Promise<any> {
     return db.updateOne(formattedTableName(this.name), id.toString(), data);
+    
   }
 
   static where<T extends Firefly<T>>(this: { new(data: any): T }, key: string, op: admin.firestore.WhereFilterOp, val: any) {
@@ -113,6 +115,7 @@ export class Firefly<T extends Firefly<T>> {
     }
     
     Object.assign(this, args);
+    this.storage = db.storage;
     this.created_at = args.created_at || new Date().toUTCString();
     this.timestamp = new Date().getTime();
   }
