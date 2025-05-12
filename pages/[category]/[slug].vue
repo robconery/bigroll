@@ -14,6 +14,15 @@
             <p class="lead">{{ post.summary }}</p>
           </div>
 
+          <!-- Featured Image -->
+          <div v-if="post.image" class="featured-image mb-4">
+            <img
+              :src="post.image"
+              :alt="post.title"
+              class="img-fluid rounded shadow-sm"
+            />
+          </div>
+
           <!-- Post content -->
           <div class="post-content">
             <ContentRenderer :value="post" />
@@ -141,6 +150,14 @@ useHead(() => ({
       property: "og:description",
       content: post.value?.summary || "Blog post not found",
     },
+    ...(post.value?.image
+      ? [
+          {
+            property: "og:image",
+            content: post.value.image,
+          },
+        ]
+      : []),
   ],
 }));
 </script>
@@ -149,6 +166,37 @@ useHead(() => ({
 .post-content {
   font-size: 1.1rem;
   line-height: 1.7;
+}
+
+.featured-image img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.featured-image {
+  overflow: hidden;
+  position: relative;
+}
+
+.featured-image::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.02));
+  transition: height 0.3s ease;
+}
+
+.featured-image:hover::after {
+  height: 100%;
+}
+
+.featured-image:hover img {
+  transform: scale(1.02);
 }
 
 .post-content :deep(h2),
