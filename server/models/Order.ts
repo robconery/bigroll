@@ -1,6 +1,7 @@
 import { Firefly } from '../lib/firefly';
-import { Authorization, Offer } from './';
+import { Authorization, Offer, Product } from './';
 import assert from 'assert';
+import { recordPurchase } from '../lib/convertkit';
 /**
  * Order model representing an order in the system
  */
@@ -27,6 +28,22 @@ export class Order extends Firefly<Order> {
     this.total = data.total;
     this.status = data.status || 'pending';
   }
+
+  async getAuthorizations(): Promise<Authorization[]> {
+    return Authorization.filter({ order: this.number });
+  }
+  async getProducts(): Promise<Product[]> {
+    const auths = await this.getAuthorizations();
+    let products: Product[] = [];
+    for (let auth of auths) {
+      const p = await Product.get(auth.sku);
+      if (p) {
+        products.push(p);
+      }
+    }
+    return products;
+  }
+    
 
   static async saveThriveOrder(data: any): Promise<[Order, Authorization[]]> {
     const { order, customer, base_product_label: slug } = data;
@@ -144,6 +161,12 @@ export class Order extends Firefly<Order> {
     
     await newOrder.save();
 
+    //ping convertkit with the order details
+    try {
+      await recordPurchase(newOrder);
+    } catch (error) {
+      console.error('Error recording purchase in ConvertKit:', error);
+    }
     return [newOrder, authorizations];
   }
 }
