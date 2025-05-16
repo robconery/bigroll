@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from 'axios';
 const secret = process.env.KIT_SECRET;
 import { Order, Offer } from '../models';
 
@@ -57,14 +57,16 @@ export const recordPurchase = async function(order: Order){
     "status": order.status || 'paid',
     "products": []
   }
-  const offer = await Offer.find({ slug: order.slug });
+  //just get the first thing. If it's a bundle, we'll see it
+  const slug = order.slug.split(',')[0];
+  const offer = await Offer.find({ slug: slug });
   if (offer) {
     payload.products.push({
       "pid": offer.slug || "",
       "lid": `${offer.slug || ""}-1`,
-      "name": offer.name || "",
+      "name": order.offer || "",
       "sku": offer.slug || "",
-      "unit_price": offer.price,
+      "unit_price": order.total || 0,
       "quantity": 1
     })
   }

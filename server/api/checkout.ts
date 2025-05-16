@@ -9,10 +9,6 @@ export default defineEventHandler(async (event) => {
     return { error: 'No session id provided' };
   }
   
-  // Get checkout session data from Stripe
-  //const session = await getCheckout(String(id));
-
-
   const session = await getCheckoutSession(String(id));
   const [order, authorizations] = await Order.saveStripeOrder(session);
   return { order, authorizations };

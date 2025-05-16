@@ -108,6 +108,22 @@ export class Order extends Firefly<Order> {
  // Generate a unique order number
     const orderNumber = `RED4-${session.id.slice(-8)}`;
     
+
+    //do we have an order already? that's completed?
+    const existingOrder = await Order.get(orderNumber);
+    if (existingOrder) {
+      if (existingOrder.status === 'completed') {
+        // If the order is already completed, return it
+        console.log(`Order ${orderNumber} already exists and is completed.`);
+        delete existingOrder.storage;
+        const authorizations = await existingOrder.getAuthorizations();
+        for (const auth of authorizations) {
+          delete auth.storage;
+        }
+        return [existingOrder, authorizations];
+      }
+    }
+
     // We've already validated that customer_email exists before calling this method
     const customerEmail = session.customer_details.email;
     //const customerEmail = session.customer_details.email.toLowerCase();
