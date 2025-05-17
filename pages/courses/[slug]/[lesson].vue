@@ -1,19 +1,5 @@
 <template>
   <div class="container-fluid position-relative" v-if="lesson && course">
-    <!-- Course progress bar -->
-    <div
-      v-if="user && isAuthorized"
-      class="course-progress-container py-2 bg-light sticky-top border-bottom mb-3"
-    >
-      <div class="container">
-        <CourseProgressBar
-          :progress="courseProgress"
-          :completedCount="completedCount"
-          :totalLessons="totalLessonsCount"
-        />
-      </div>
-    </div>
-
     <div class="row g-5">
       <!-- Sidebar -->
       <div class="col-lg-3 pb-lg-5">
@@ -140,6 +126,17 @@
             allowfullscreen
           ></iframe>
         </div>
+        <div
+          v-if="user && isAuthorized"
+          class="course-progress-container py-3 mt-2"
+        >
+          <CourseProgressBar
+            :progress="courseProgress"
+            :completedCount="completedCount"
+            :totalLessons="totalLessonsCount"
+          />
+        </div>
+
         <div v-else class="col-12 position-relative bg-dark rounded-4 mt-4">
           <img
             :src="
