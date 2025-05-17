@@ -32,8 +32,47 @@
       <!-- Right content END -->
     </div>
 
-    <!-- Access section -->
-    <div v-if="hasAccess" class="bg-info p-4 p-sm-5 rounded-3">
+    <!-- Free Course Banner -->
+    <div v-if="isFree" class="bg-success p-4 p-sm-5 rounded-3 mb-4">
+      <div class="row position-relative">
+        <!-- Svg decoration -->
+        <figure
+          class="fill-white opacity-1 position-absolute top-50 start-0 translate-middle-y"
+        >
+          <svg width="141px" height="141px">
+            <path
+              d="M140.520,70.258 C140.520,109.064 109.062,140.519 70.258,140.519 C31.454,140.519 -0.004,109.064 -0.004,70.258 C-0.004,31.455 31.454,-0.003 70.258,-0.003 C109.062,-0.003 140.520,31.455 140.520,70.258 Z"
+            ></path>
+          </svg>
+        </figure>
+        <!-- Action box -->
+        <div class="col-12 mx-auto position-relative">
+          <div class="row align-items-center">
+            <!-- Title -->
+            <div class="col-lg-7">
+              <h3 class="text-white">This Course is Free!</h3>
+              <p class="text-white mb-0">
+                Feel free to watch any of the lessons below - no login required!
+              </p>
+            </div>
+            <!-- Content and input -->
+            <div class="col-lg-5 text-lg-end">
+              <NuxtLink
+                v-if="lessons && lessons.length > 0"
+                :to="`/courses/${course.slug}/${lessons[0].slug}`"
+                class="btn btn-outline-white mb-0 text-white"
+              >
+                Start watching now!
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Row END -->
+    </div>
+
+    <!-- Access section for authorized users -->
+    <div v-else-if="hasAccess" class="bg-info p-4 p-sm-5 rounded-3">
       <div class="row position-relative">
         <!-- Svg decoration -->
         <figure
@@ -56,7 +95,7 @@
                 looking for, otherwise jump right in!
               </p>
               <!-- Course progress -->
-              <div class="pt-3" v-if="completedCount > 0">
+              <div class="pt-3" v-if="isLoggedIn && completedCount > 0">
                 <CourseProgressBar
                   :progress="courseProgress"
                   :completedCount="completedCount"
@@ -87,6 +126,7 @@
       <!-- Row END -->
     </div>
 
+    <!-- Banner for users without access -->
     <div v-else class="bg-grad-blue p-3 p-sm-5 rounded-3">
       <div class="row justify-content-center position-relative">
         <!-- SVG decoration -->
@@ -115,8 +155,11 @@
       <!-- Row END -->
     </div>
 
-    <!-- Progress bar -->
-    <div v-if="hasAccess && lessons.length > 0" class="my-4">
+    <!-- Progress bar - only shown for logged in and authorized users -->
+    <div
+      v-if="isLoggedIn && hasAccess && !isFree && lessons.length > 0"
+      class="my-4"
+    >
       <CourseProgressBar
         :progress="courseProgress"
         :completed="completedCount"
@@ -141,9 +184,10 @@
               class="card-img-top"
               alt="course image"
             />
-            <!-- Completed badge -->
+            <!-- Completed badge - only shown for logged in users -->
             <div
               v-if="
+                isLoggedIn &&
                 hasAccess &&
                 completedLessons.some((cl) => cl.lessonSlug === lesson.slug)
               "
@@ -172,6 +216,7 @@
               </span>
               <span
                 v-if="
+                  isLoggedIn &&
                   hasAccess &&
                   completedLessons.some((cl) => cl.lessonSlug === lesson.slug)
                 "
@@ -198,18 +243,29 @@ const { slug } = route.params;
 // Get the current user and auth store
 const { user, authorizations } = useFirebaseAuth();
 
-// Handle course access using the auth store
-const hasAccess = computed(() => {
-  // Allow access if the user is authenticated and authorized for this course
-  return (
-    user.value &&
-    authorizations.value.some((auth) => auth.sku === course.value.slug)
-  );
-});
+// Check if user is logged in
+const isLoggedIn = computed(() => !!user.value);
 
 // Fetch the course data
 const { data: course } = await useAsyncData(`course-${slug}`, () => {
   return queryCollection("courses").where("slug", "=", slug).first();
+});
+
+// Check if the course is free
+const isFree = computed(() => {
+  return course.value?.access === "Free";
+});
+
+// Handle course access using the auth store
+const hasAccess = computed(() => {
+  // If course is free, everyone has access
+  if (isFree.value) return true;
+
+  // Otherwise, user needs to be authenticated and authorized for this course
+  return (
+    user.value &&
+    authorizations.value.some((auth) => auth.sku === course.value.slug)
+  );
 });
 
 // Fetch the lessons for this course
@@ -227,7 +283,8 @@ const completedCount = ref(0);
 
 // Track progress when user and course are available
 watchEffect(async () => {
-  if (user.value?.uid && course.value?.slug && lessons.value?.length) {
+  // Only track progress for logged in users
+  if (isLoggedIn.value && course.value?.slug && lessons.value?.length) {
     try {
       // Get all completed lessons for this course
       const completed = await getCompletedLessons(user.value.uid);
@@ -245,6 +302,11 @@ watchEffect(async () => {
     } catch (error) {
       console.error("Error fetching course progress:", error);
     }
+  } else {
+    // Reset progress tracking for non-logged in users
+    completedLessons.value = [];
+    courseProgress.value = 0;
+    completedCount.value = 0;
   }
 });
 

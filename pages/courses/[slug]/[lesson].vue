@@ -53,35 +53,9 @@
                         <div class="me-2">
                           <span
                             class="btn btn-round btn-sm mb-0 d-flex align-items-center justify-content-center"
-                            :class="
-                              lessonItem.free
-                                ? 'btn-success'
-                                : isAuthorized &&
-                                  completedLessons.some(
-                                    (cl) => cl.lessonSlug === lessonItem.slug
-                                  )
-                                ? 'btn-success'
-                                : isAuthorized
-                                ? 'btn-info'
-                                : 'btn-secondary'
-                            "
+                            :class="getLessonButtonClass(lessonItem)"
                           >
-                            <i
-                              :class="
-                                lesson.slug === lessonItem.slug
-                                  ? 'fas fa-play'
-                                  : lessonItem.free
-                                  ? 'fas fa-unlock'
-                                  : isAuthorized &&
-                                    completedLessons.some(
-                                      (cl) => cl.lessonSlug === lessonItem.slug
-                                    )
-                                  ? 'fas fa-check'
-                                  : isAuthorized
-                                  ? 'far fa-circle'
-                                  : 'fas fa-lock'
-                              "
-                            ></i>
+                            <i :class="getLessonIconClass(lessonItem)"></i>
                           </span>
                         </div>
                         <div class="flex-grow-1">
@@ -113,10 +87,7 @@
       <!-- Main content -->
       <div class="col-lg-8 mx-auto">
         <!-- Video player or image -->
-        <div
-          v-if="(isAuthorized || lesson.free) && lesson.vimeo"
-          class="embed-container"
-        >
+        <div v-if="canWatch && lesson.vimeo" class="embed-container">
           <iframe
             id="vimeo-player"
             class="mx-auto"
@@ -137,7 +108,10 @@
           />
         </div>
 
-        <div v-else class="col-12 position-relative bg-dark rounded-4 mt-4">
+        <div
+          v-else-if="!canWatch || !lesson.vimeo"
+          class="col-12 position-relative bg-dark rounded-4 mt-4"
+        >
           <img
             :src="
               lesson.image
@@ -283,6 +257,11 @@ const isAuthorized = computed(() => {
   );
 });
 
+// Check if user can watch the lesson (either authorized or free lesson)
+const canWatch = computed(() => {
+  return isAuthorized.value || lesson.value?.free;
+});
+
 // Lesson completion state
 const isLessonCompleted = ref(false);
 const completedLessons = ref([]);
@@ -386,6 +365,62 @@ const lessonsByCategory = computed(() => {
 
   return categories;
 });
+
+// Compute the button class based on lesson status
+const getLessonButtonClass = (lessonItem) => {
+  if (course.value.access.toLowerCase() === "free") {
+    return "btn-success";
+  }
+  if (lessonItem.free) {
+    return "btn-success";
+  }
+
+  if (
+    isAuthorized.value &&
+    completedLessons.value.some((cl) => cl.lessonSlug === lessonItem.slug)
+  ) {
+    return "btn-success";
+  }
+
+  if (isAuthorized.value) {
+    return "btn-info";
+  }
+
+  return "btn-secondary";
+};
+
+// Compute the icon class based on lesson status
+const getLessonIconClass = (lessonItem) => {
+  if (!lessonItem.vimeo) {
+    //return a reading icon if no vimeo id
+    return "fas fa-book";
+  }
+
+  if (course.value.access.toLowerCase() === "free") {
+    return "fas fa-play";
+  }
+
+  if (lesson.value.slug === lessonItem.slug) {
+    return "fas fa-play";
+  }
+
+  if (lessonItem.free) {
+    return "fas fa-unlock";
+  }
+
+  if (
+    isAuthorized.value &&
+    completedLessons.value.some((cl) => cl.lessonSlug === lessonItem.slug)
+  ) {
+    return "fas fa-check";
+  }
+
+  if (isAuthorized.value) {
+    return "far fa-circle";
+  }
+
+  return "fas fa-lock";
+};
 
 // Calculate the current lesson index
 const currentLessonIndex = computed(() => {

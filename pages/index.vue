@@ -114,17 +114,7 @@
               <!-- Form -->
               <div class="col-lg-12 mx-auto py-lg-2">
                 <div class="mx-auto">
-                  <!-- Replace with Nuxt compatible subscription form -->
-                  <div class="input-group">
-                    <input
-                      type="email"
-                      class="form-control"
-                      placeholder="Your email address"
-                    />
-                    <button class="btn btn-primary" type="button">
-                      Subscribe
-                    </button>
-                  </div>
+                  <KitSignup />
                 </div>
               </div>
             </div>
@@ -223,9 +213,12 @@
                   class="card-img-overlay d-flex align-items-start flex-column p-3"
                 >
                   <div class="w-100 d-flex justify-content-between">
-                    <span class="badge bg-danger mb-2">{{
-                      course.access
-                    }}</span>
+                    <span
+                      :class="`badge ${
+                        course.access === 'Free' ? 'bg-success' : 'bg-dark'
+                      } mb-2`"
+                      >{{ course.access }}</span
+                    >
                     <span class="badge bg-info mb-2">{{
                       course.category
                     }}</span>
