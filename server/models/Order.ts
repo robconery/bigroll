@@ -94,6 +94,13 @@ export class Order extends Firefly<Order> {
 
     newOrder.status = 'completed';
     await newOrder.save();
+
+    //ping convertkit with the order details
+    try {
+      await recordPurchase(newOrder);
+    } catch (error) {
+      console.error('Error recording purchase in ConvertKit:', error);
+    }
     return [newOrder, authorizations];
 
     //send an email to the user with the order details

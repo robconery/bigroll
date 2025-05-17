@@ -31,8 +31,8 @@ export default defineNuxtConfig({
   
   // Register global middleware for authentication
   routeRules: {
-    '/dashboard': { appMiddleware: ['auth'] },
-    '/invoice/**': { appMiddleware: ['auth'] },
+    // '/dashboard': { appMiddleware: ['auth'] },
+    // '/invoice/**': { appMiddleware: ['auth'] },
   },
   
   app: {

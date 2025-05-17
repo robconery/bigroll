@@ -36,7 +36,7 @@
               </p>
 
               <!-- Loading state -->
-              <div v-if="isLoadingOrders" class="text-center py-3">
+              <div v-if="isLoadingOrders && user" class="text-center py-3">
                 <div class="spinner-border text-primary" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </div>
@@ -81,7 +81,18 @@
 
       <!-- Main content START -->
       <div class="col-lg-8">
-        <!-- Title -->
+        <!-- Not logged in banner -->
+        <div v-if="!user && !isLoading" class="mt-6 mb-4">
+          <div class="bg-grad-warning rounded p-4 text-center">
+            <h2 class="text-white mb-3">You're Not Logged In</h2>
+            <p class="text-white mb-4">
+              Please log in to access your dashboard, courses, and downloads.
+            </p>
+            <button @click="router.push('/login')" class="btn btn-light btn-lg">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
+            </button>
+          </div>
+        </div>
 
         <!-- Subscription section for active subscribers -->
         <div
@@ -338,6 +349,10 @@ watch(
       } finally {
         isLoadingOrders.value = false;
       }
+    } else {
+      // Reset orders and loading state if not logged in
+      orders.value = [];
+      isLoadingOrders.value = false;
     }
   },
   { immediate: true }
@@ -411,6 +426,14 @@ useHead({
 
 .bg-grad-pink {
   background: linear-gradient(to right, #d63384, #dc3545);
+}
+
+.bg-grad-warning {
+  background: linear-gradient(to right, #fd7e14, #ffc107);
+}
+
+.bg-grad-warning {
+  background: linear-gradient(to right, #ffc107, #fd7e14);
 }
 
 .rotate-74 {

@@ -14,8 +14,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   // Set of paths that require authentication
   const protectedPaths = [
-    '/dashboard',
-    '/invoice'
+    '/admin',
   ]
 
   // Check if the current path requires authentication
