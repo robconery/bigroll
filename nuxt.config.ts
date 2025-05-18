@@ -1,6 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
+  content: {
+    build: {
+      markdown: {
+        highlight: {
+          // Theme used in all color schemes.
+          theme: 'min-dark',
+        }
+      }
+    }
+  },
   modules: ['@nuxt/content', '@nuxt/scripts'],
   nitro: {
     firebase: {

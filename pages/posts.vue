@@ -49,9 +49,7 @@
                           {{ post.title }}
                         </NuxtLink>
                       </h5>
-                      <p class="card-text mb-3">
-                        {{ post.summary }}
-                      </p>
+                      <p class="card-text mb-3" v-html="post.summary"></p>
                     </div>
                   </div>
                 </div>

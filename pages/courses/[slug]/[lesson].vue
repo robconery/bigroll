@@ -496,13 +496,6 @@ useHead({
   margin-bottom: 1rem;
 }
 
-.lesson-content pre {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  overflow-x: auto;
-}
-
 .lesson-content img {
   max-width: 100%;
   height: auto;

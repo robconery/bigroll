@@ -5,14 +5,14 @@ price: 149.00
 stripe: "https://stripe.com"
 ---
 
-::sales-hero{image="https://placehold.co/800x400?text=Missing+CS+Degree"}
+::hero{image="https://placehold.co/800x400?text=Missing+CS+Degree"}
 
 # Stop Feeling Like An Impostor In Your Own Career
 
 Every day, brilliant developers like you hit invisible walls because they don't have a CS degree and think they need one. Those moments when technical terms fly over your head and you wonder if there's a secret handshake everyone learned but you. We've all felt this way and **today this will end for you**.
 ::
 
-::sales-person
+::simple-title
 
 ## You're Great at What You Do, But Something's Missing
 
@@ -23,7 +23,7 @@ But in meetings, when colleagues casually toss around terms like "cyclomatic com
 You're not alone. Thousands of self-taught developers share this exact feeling, silently mouthing "I'll look that up later" while confidently nodding through discussions about algorithmic complexity.
 ::
 
-::sales-problem
+::gray-card
 
 ## The Self-Taught Developer's Dilemma
 
@@ -38,7 +38,7 @@ Without a formal CS education, you're missing pieces of the puzzle that others t
 This isn't just uncomfortable—it's holding back your career and costing you opportunities. Each day that passes with these gaps unfilled is another day you're not reaching your full potential.
 ::
 
-::sales-story
+::text-left
 
 ## I've Been There and Hated It
 
@@ -51,7 +51,7 @@ In 2011 I was at a work party and my colleagues were debating `O(log n)` vs. `O(
 And then one of the raised a glass and proclaimed "COMP-SCI BABY!" and I slowly backed out of the room...
 ::
 
-::sales-solution
+::title-with-video
 
 ## The Solution: A CS Education Designed For Working Developers
 
@@ -64,7 +64,7 @@ In 2016 I released _The Imposter's Handbook_, a culmination of my studies and, a
 That's what you're reading about now: I've distilled everything I have learned learned into "The Missing CS Degree": a comprehensive course specifically designed for self-taught programmers who want to rid themselves of Imposter Syndrome and finally feel like they're catching up with the conversation.
 ::
 
-::sales-ask
+::call-to-action
 
 ## Take The Next Step In Your Development Career
 
@@ -73,7 +73,7 @@ That's what you're reading about now: I've distilled everything I have learned l
 <a href="#pricing" class="cta-button">Enroll Now</a>
 ::
 
-::sales-assert
+::simple-title
 
 ## What You'll Get
 
@@ -86,9 +86,10 @@ That's what you're reading about now: I've distilled everything I have learned l
 - **Community Support**: Join a community of peers facing the same challenges, so you never have to struggle alone.
 
 - **Lifetime Access**: Learn at your own pace with unlimited access to all course materials, including future updates, so your investment continues to pay dividends throughout your career.
-  ::
 
-::sales-affirm
+::
+
+::simple-title
 
 ## No Risk, Guaranteed Results
 
@@ -101,4 +102,5 @@ I'm so confident in the value of this course that I offer a 30-day, no-questions
 > "The algorithms section alone helped me optimize a key feature that was causing performance issues. My team was impressed, and I finally felt like I belonged." — Sarah M., Full-Stack Developer
 
 > "I went from dreading technical interviews to actively seeking them out. Just landed a role that pays 30% more than my previous position." — James T., Frontend Engineer
-> ::
+
+::

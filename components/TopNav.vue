@@ -44,13 +44,25 @@
               <li class="nav-item">
                 <NuxtLink class="nav-link" to="/posts">Posts</NuxtLink>
               </li>
-
+              <div class="nav-item px-2" v-if="!isAdmin">
+                <form class="position-relative" action="/search" method="get">
+                  <input
+                    class="form-control pe-5 bg-transparent"
+                    type="search"
+                    placeholder="Search"
+                    aria-label="Search"
+                    name="q"
+                  />
+                  <button
+                    class="btn bg-transparent px-2 py-0 position-absolute top-50 end-0 translate-middle-y"
+                    type="submit"
+                  >
+                    <i class="fas fa-search fs-6"></i>
+                  </button>
+                </form>
+              </div>
               <!-- Auth links -->
               <template v-if="user">
-                <!-- Admin buttons -->
-
-                <!-- Regular user -->
-
                 <!-- User avatar with dropdown -->
                 <li class="nav-item dropdown ms-2">
                   <a

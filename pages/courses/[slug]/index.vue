@@ -96,11 +96,6 @@
               </p>
               <!-- Course progress -->
               <div class="pt-3" v-if="isLoggedIn && completedCount > 0">
-                <CourseProgressBar
-                  :progress="courseProgress"
-                  :completedCount="completedCount"
-                  :totalLessons="lessons.length"
-                />
                 <p
                   class="text-white mt-1 small"
                   v-if="completedCount === lessons.length"
@@ -166,7 +161,6 @@
       />
     </div>
 
-    <!-- Lessons grid -->
     <div class="row">
       <div
         v-for="lesson in lessons"
