@@ -23,6 +23,97 @@
                 {{ userModel?.name || user?.displayName || user?.email }}
               </h1>
             </div>
+
+            <!-- Subscription section for active subscribers -->
+            <div
+              v-if="subscription && isSubscriptionActive"
+              class="container mt-6 p-0"
+            >
+              <div class="row">
+                <div class="col-12 position-relative z-index-1">
+                  <!-- Decorative SVGs -->
+
+                  <div
+                    class="bg-grad-blue rounded position-relative z-index-n1 overflow-hidden p-4"
+                  >
+                    <!-- SVG decorations would go here -->
+                    <div
+                      class="row g-3 align-items-center justify-content-lg-end position-relative py-4"
+                    >
+                      <!-- Subscription message -->
+                      <div class="col p-3">
+                        <h2 class="text-white">You're a Subscriber!</h2>
+                        <p class="text-white mb-0">
+                          Thanks so much for supporting me! You're the best! 🙌
+                          You can watch anything in the catalog, which you can
+                          access from the "courses" link in the menu.
+                        </p>
+                        <div class="mt-3 text-white">
+                          <div>
+                            <strong>Plan:</strong> {{ subscription.plan }}
+                          </div>
+                          <div>
+                            <strong>Billing Interval:</strong>
+                            {{ subscription.interval }}
+                          </div>
+                          <div>
+                            <strong>Current Period:</strong>
+                            {{ formatDate(subscription.current_period_start) }}
+                            -
+                            {{ formatDate(subscription.current_period_end) }}
+                          </div>
+                          <p class="mt-3">
+                            <a
+                              href="https://billing.stripe.com/p/login/28oaFsd7PgdXafCeUU"
+                              class="btn btn-primary mb-0 btn-outline-white"
+                              >Manage Subscription</a
+                            >
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expired subscription notice -->
+            <div
+              v-if="subscription && !isSubscriptionActive"
+              class="container p-0"
+            >
+              <div class="row">
+                <div class="col-12 position-relative z-index-1">
+                  <!-- Similar decorative elements as above -->
+                  <div
+                    class="bg-grad-pink rounded position-relative z-index-n1 overflow-hidden p-4"
+                  >
+                    <div
+                      class="row g-3 align-items-center justify-content-lg-end position-relative py-4"
+                    >
+                      <div class="col">
+                        <h3 class="text-white">
+                          Your Subscription has Expired
+                        </h3>
+                        <p class="text-white mb-0">
+                          Your {{ subscription.plan }} subscription ended on
+                          {{ formatDate(subscription.current_period_end) }}.
+                          Thanks so much for your past support! Would love to
+                          have you back! 🙌
+                        </p>
+                        <p class="mt-3 text-white">
+                          <a
+                            href="https://billing.stripe.com/p/login/28oaFsd7PgdXafCeUU"
+                            class="btn btn-primary btn-outline-white mb-0"
+                            >Reactivate Subscription</a
+                          >
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="col-md-6 col-lg-12">
@@ -91,96 +182,6 @@
             <button @click="router.push('/login')" class="btn btn-light btn-lg">
               <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
             </button>
-          </div>
-        </div>
-
-        <!-- Subscription section for active subscribers -->
-        <div
-          v-if="subscription && isSubscriptionActive"
-          class="container mt-6 p-0"
-        >
-          <div class="row">
-            <div class="col-12 position-relative z-index-1">
-              <!-- Decorative SVGs -->
-
-              <div
-                class="bg-grad-blue rounded position-relative z-index-n1 overflow-hidden p-4"
-              >
-                <!-- SVG decorations would go here -->
-                <div
-                  class="row g-3 align-items-center justify-content-lg-end position-relative py-4"
-                >
-                  <!-- Subscription message -->
-                  <div class="col p-3">
-                    <h2 class="text-white">You're a Subscriber!</h2>
-                    <p class="text-white mb-0">
-                      Thanks so much for supporting me! You're the best! 🙌 You
-                      can watch anything in the catalog, which you can access
-                      from the "courses" link in the menu.
-                    </p>
-                    <div class="mt-3 text-white">
-                      <div><strong>Plan:</strong> {{ subscription.plan }}</div>
-                      <div>
-                        <strong>Billing Interval:</strong>
-                        {{ subscription.interval }}
-                      </div>
-                      <div>
-                        <strong>Current Period:</strong>
-                        {{ formatDate(subscription.current_period_start) }} -
-                        {{ formatDate(subscription.current_period_end) }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mt-4">
-              <div class="d-sm-flex">
-                <a
-                  href="https://billing.stripe.com/p/login/28oaFsd7PgdXafCeUU"
-                  class="btn btn-primary mb-0"
-                  >Manage Subscription</a
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expired subscription notice -->
-        <div
-          v-if="subscription && !isSubscriptionActive"
-          class="container mt-6 p-0"
-        >
-          <div class="row">
-            <div class="col-12 position-relative z-index-1">
-              <!-- Similar decorative elements as above -->
-              <div
-                class="bg-grad-pink rounded position-relative z-index-n1 overflow-hidden p-4"
-              >
-                <div
-                  class="row g-3 align-items-center justify-content-lg-end position-relative py-4"
-                >
-                  <div class="col">
-                    <h2 class="text-white">Your Subscription has Expired</h2>
-                    <p class="text-white mb-0">
-                      Your {{ subscription.plan }} subscription ended on
-                      {{ formatDate(subscription.current_period_end) }}. Thanks
-                      so much for your past support! Would love to have you
-                      back! 🙌
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mt-4">
-              <div class="d-sm-flex">
-                <a
-                  href="https://billing.stripe.com/p/login/28oaFsd7PgdXafCeUU"
-                  class="btn btn-primary mb-0"
-                  >Reactivate Subscription</a
-                >
-              </div>
-            </div>
           </div>
         </div>
 
@@ -271,6 +272,10 @@ const isGeneratingLink = ref(null);
 // Check if subscription is active (current_period_end is in the future)
 const isSubscriptionActive = computed(() => {
   if (!subscription.value) return false;
+  else {
+    const currentPeriodEnd = subscription.value.current_period_end;
+    return currentPeriodEnd && currentPeriodEnd.seconds > Date.now() / 1000;
+  }
   //return subscription.value.isActive();
 });
 

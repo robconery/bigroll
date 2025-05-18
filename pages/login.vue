@@ -16,21 +16,22 @@
             <img src="/images/doodles/boat.png" class="rounded-4" alt="" />
           </div>
           <p class="my-4 lead">
-            If you're looking for your downloads you don't need to login, though
-            you're welcome to. You can just
-            <NuxtLink to="/downloads">head over to the downloads page</NuxtLink>
-            and we'll send them over to you. Otherwise, pop your stuff to the
-            right.
+            If you're looking for your downloads, you can
+            <NuxtLink to="/downloads">head over to the downloads page</NuxtLink
+            >.
           </p>
-          <!-- Content -->
-          <div class="my-4 lead"></div>
+          <p class="my-4 lead">
+            To log in, please use the "Login" button in the site header. If
+            you've been sent a magic link, this page will process your login
+            automatically.
+          </p>
         </div>
 
         <!-- Right column -->
         <div class="col-12 col-lg-5 mx-auto mt-lg-8">
           <!-- Title -->
           <span class="mb-0 fs-1">👋</span>
-          <h1 class="fs-2">Welcome!</h1>
+          <h1 class="fs-2">Login Processing</h1>
 
           <!-- Email update notification from query parameter -->
           <div
@@ -42,87 +43,30 @@
           </div>
 
           <div v-if="error" class="alert alert-danger" role="alert">
-            {{ error }}
+            {{ error.message || error }}
           </div>
-          <div v-if="magicLinkSent" class="alert alert-success" role="alert">
-            Magic link sent! Please check your email inbox.
+          <div
+            v-if="isProcessingEmailLink"
+            class="alert alert-info"
+            role="alert"
+          >
+            Processing your login... Please wait.
           </div>
-
-          <form @submit.prevent="sendMagicLink" v-if="!isProcessingEmailLink">
-            <div class="mb-4">
-              <label for="email" class="form-label">Email address *</label>
-              <div class="input-group input-group-lg">
-                <span
-                  class="input-group-text bg-light rounded-start border-0 text-secondary px-3"
-                >
-                  <i class="bi bi-envelope-fill"></i>
-                </span>
-                <input
-                  type="email"
-                  class="form-control border-0 bg-light rounded-end ps-1"
-                  id="email"
-                  placeholder="E-mail"
-                  v-model="email"
-                  :class="{
-                    'is-valid':
-                      route.query.email && email === route.query.email,
-                  }"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="align-items-center mt-0">
-              <div class="d-grid">
-                <button
-                  type="submit"
-                  class="btn btn-primary mb-0"
-                  id="submit-button"
-                  :disabled="isLoading"
-                >
-                  {{ isLoading ? "Sending..." : "Send Magic Link" }}
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <!-- Social buttons and divider -->
-          <div class="row" v-if="!isProcessingEmailLink">
-            <!-- Divider with text -->
-            <div class="position-relative my-4">
-              <hr />
-              <p
-                class="small position-absolute top-50 start-50 translate-middle bg-body px-5"
-              >
-                Or
-              </p>
-            </div>
-
-            <!-- Social btn -->
-            <div class="col-lg-6 d-grid">
-              <button
-                type="button"
-                class="btn bg-danger mb-2 mb-xxl-0 w-100 text-white"
-                @click="loginWithGoogle"
-                :disabled="isLoading"
-              >
-                <i class="fab fa-fw fa-google text-white me-2"></i>Login with
-                Google
-              </button>
-            </div>
-
-            <!-- Social btn -->
-            <div class="col-lg-6 d-grid">
-              <button
-                type="button"
-                class="btn bg-black mb-2 mb-xxl-0 w-100 text-white"
-                @click="loginWithGithub"
-                :disabled="isLoading"
-              >
-                <i class="fab fa-fw fa-github me-2 text-white"></i>Login with
-                GitHub
-              </button>
-            </div>
+          <div
+            v-if="!isProcessingEmailLink && !user && !error"
+            class="alert alert-info"
+            role="alert"
+          >
+            Please use the login button in the navigation bar to sign in or
+            register. If you've clicked a magic link from your email, we're
+            attempting to sign you in.
+          </div>
+          <div
+            v-if="user && !isProcessingEmailLink"
+            class="alert alert-success"
+            role="alert"
+          >
+            You are logged in! Redirecting to your dashboard...
           </div>
         </div>
       </div>
@@ -131,35 +75,34 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import { isSignInWithEmailLink } from "firebase/auth";
 
 const {
   user,
-  sendSignInLinkToEmail,
   completeSignInWithEmailLink,
-  loginWithGoogle,
-  loginWithGithub,
-  error,
-  isLoading,
+  error, // Using error from useFirebaseAuth
+  // isLoading, // isLoading might not be directly relevant here unless we add specific actions
   initAuthState,
 } = useFirebaseAuth();
 const route = useRoute();
-const email = ref(route.query.email?.toString() || "");
-const magicLinkSent = ref(false);
-const isProcessingEmailLink = ref(false);
 const router = useRouter();
 const { $auth } = useNuxtApp();
 
-// Initialize the auth state observer
-//initAuthState();
+const isProcessingEmailLink = ref(false);
+
+// Initialize the auth state observer if needed, though TopNav might already do it.
+// initAuthState(); // Consider if this is needed or if TopNav's init is sufficient.
 
 // Redirect logged-in users to dashboard
 watch(
   user,
   (newUser) => {
     if (newUser && !isProcessingEmailLink.value) {
-      router.push("/dashboard");
+      // Check if current route is /login to prevent redirect loops if already navigating away
+      if (router.currentRoute.value.path === "/login") {
+        router.push("/dashboard");
+      }
     }
   },
   { immediate: true }
@@ -169,8 +112,13 @@ onMounted(async () => {
   // Only run Firebase authentication code on the client side
   if (!import.meta.client) return;
 
-  // If user is already logged in, redirect to dashboard
-  if (user.value && !isProcessingEmailLink.value) {
+  // If user is already logged in (e.g. navigated back to /login), redirect to dashboard
+  // The watcher above should handle this, but an immediate check can be useful.
+  if (
+    user.value &&
+    !isProcessingEmailLink.value &&
+    router.currentRoute.value.path === "/login"
+  ) {
     router.push("/dashboard");
     return;
   }
@@ -178,12 +126,14 @@ onMounted(async () => {
   // Check if the URL contains an email sign-in link
   if (isSignInWithEmailLink($auth, window.location.href)) {
     isProcessingEmailLink.value = true;
+    // error.value = null; // Clear previous errors before attempting sign-in
 
     // Get the email from localStorage that was saved when sending the link
     let emailForSignIn = localStorage.getItem("emailForSignIn");
 
     if (!emailForSignIn) {
       // If email is not in localStorage, prompt user for it
+      // This is a fallback, ideally emailForSignIn should always be set
       emailForSignIn = window.prompt(
         "Please provide your email for confirmation"
       );
@@ -191,29 +141,26 @@ onMounted(async () => {
 
     if (emailForSignIn) {
       try {
-        await completeSignInWithEmailLink(emailForSignIn);
+        await completeSignInWithEmailLink(emailForSignIn, window.location.href); // Pass full href
         // Clear email from storage
         localStorage.removeItem("emailForSignIn");
-        // Redirect to dashboard after successful sign-in
-        router.push("/dashboard");
+        // Redirect to dashboard after successful sign-in, watcher should also catch this.
+        // router.push("/dashboard"); // Watcher will handle this.
       } catch (err) {
         console.error("Error completing sign-in with email link:", err);
-        // Reset the isProcessingEmailLink so the user can try again
+        // error ref from useFirebaseAuth should be populated
+      } finally {
         isProcessingEmailLink.value = false;
       }
     } else {
+      // No email provided for sign-in link completion
+      // error.value = { message: "Email not found for completing sign-in. Please try sending the link again." };
+      console.error("Email for sign-in not found in localStorage or prompt.");
       isProcessingEmailLink.value = false;
     }
   }
 });
-const sendMagicLink = async () => {
-  try {
-    await sendSignInLinkToEmail(email.value);
-    // Store the email in localStorage so we can retrieve it when the user clicks the link
-    localStorage.setItem("emailForSignIn", email.value);
-    magicLinkSent.value = true;
-  } catch (err) {
-    console.error("Error sending magic link:", err);
-  }
-};
+
+// No form submission logic here anymore (sendMagicLink, social logins)
+// That logic is now in TopNav.vue's modal.
 </script>
