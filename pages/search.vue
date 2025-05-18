@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5">
+  <div class="container mt-5 h-full" style="min-height: 300px">
     <h1>Search Results</h1>
     <div v-if="searchTerm" class="mb-4">
       <p>
@@ -52,21 +52,29 @@
 const route = useRoute();
 const error = ref(null);
 const isLoading = ref(true);
+
 const searchTerm = computed(() => {
   const query = route.query.q;
   return typeof query === "string" && query.trim() !== "" ? query.trim() : "";
 });
 
-const { data: lessons } = await useAsyncData("lessons-search", () => {
-  return queryCollection("lessons")
-    .where("summary", "LIKE", `%${searchTerm.value}%`)
-    .all();
-});
-const { data: posts } = await useAsyncData("posts-search", () => {
-  return queryCollection("posts")
-    .where("summary", "LIKE", `%${searchTerm.value}%`)
-    .all();
-});
+if (searchTerm.value && searchTerm.value.length < 3) {
+  error.value = new Error("Search term must be at least 3 characters long.");
+  isLoading.value = false;
+}
+if (!error.value) {
+  isLoading.value = true;
+  const { data: lessons } = await useAsyncData("lessons-search", () => {
+    return queryCollection("lessons")
+      .where("summary", "LIKE", `%${searchTerm.value}%`)
+      .all();
+  });
+  const { data: posts } = await useAsyncData("posts-search", () => {
+    return queryCollection("posts")
+      .where("summary", "LIKE", `%${searchTerm.value}%`)
+      .all();
+  });
+}
 
 // Function to get proper post link with category
 const getPostLink = (post) => {

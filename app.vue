@@ -28,7 +28,7 @@
               <li class="list-inline-item">
                 <a
                   class="btn btn-dark btn-sm shadow px-2 text-twitter"
-                  href="https://twitter.com/@robconery"
+                  href="https://bsky.app/profile/robconery.com"
                 >
                   <i class="fab fa-fw fa-twitter"></i>
                 </a>
@@ -70,48 +70,37 @@
           <!-- Widget 1 END -->
 
           <!-- Widget 2 START -->
-          <div class="col-lg-6">
+          <div class="col-lg-5">
             <div class="row g-4">
               <!-- Link block -->
-              <div class="col-6 col-md-5">
+              <div class="col-6">
                 <h5 class="mb-2 mb-md-4 text-white">Publications</h5>
                 <ul class="nav flex-column">
                   <li class="nav-item">
                     <a
                       class="nav-link text-light"
-                      href="https://bigmachine.io/products/the-imposters-handbook"
+                      href="/offers/imposter-second"
                       >The Imposter's Handbook</a
                     >
                   </li>
                   <li class="nav-item">
-                    <a
-                      class="nav-link text-light"
-                      href="https://bigmachine.io/products/imposter-interview"
-                      >Imposter Video Companion</a
+                    <a class="nav-link text-light" href="/offers/roadmap"
+                      >The Imposter's Roadmap</a
                     >
                   </li>
                   <li class="nav-item">
-                    <a
-                      class="nav-link text-light"
-                      href="https://bigmachine.io/products/a-curious-moon"
+                    <a class="nav-link text-light" href="/offers/curious-moon"
                       >A Curious Moon</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a
-                      class="nav-link text-light"
-                      href="https://bigmachine.io/products/pwned"
-                      >PWNED!</a
                     >
                   </li>
                 </ul>
               </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6">
                 <h5 class="mb-2 mb-md-4 text-white">Links</h5>
                 <ul class="nav flex-column">
                   <li class="nav-item">
                     <NuxtLink class="nav-link text-light" to="/posts"
-                      >Blog Archive</NuxtLink
+                      >Posts</NuxtLink
                     >
                   </li>
                   <li class="nav-item">
@@ -130,58 +119,13 @@
                   </li>
                 </ul>
               </div>
-              <div class="col-6 col-md-4">
-                <h5 class="mb-2 mb-md-4 text-white">Courses</h5>
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <NuxtLink
-                      class="nav-link text-light"
-                      to="/courses/imposter-video"
-                      >CS Fundamentals</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <NuxtLink
-                      class="nav-link text-light"
-                      to="/courses/mission-interview"
-                      >Mission: Interview</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-link text-light">
-                    <NuxtLink
-                      class="nav-link text-light"
-                      to="/courses/accelerator"
-                      >Frontend Accelerator</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <NuxtLink
-                      class="nav-link text-light"
-                      to="/courses/sql-orbit"
-                      >PostgreSQL Fundamentals</NuxtLink
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <NuxtLink
-                      class="nav-link text-light"
-                      to="/courses/take-off-with-elixir"
-                      >Take Off With Elixir</NuxtLink
-                    >
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
           <!-- Widget 2 END -->
 
           <!-- Widget 3 START -->
-          <div class="col-lg-3">
-            <h5 class="mb-2 mb-md-4 text-white">Contact</h5>
-            <p class="text-light">
-              <b>Rob Conery</b><br />
-              rob@bigmachine.io <br />
-              @robconery <br />
-            </p>
+          <div class="col-lg-4">
+            <KitFooter />
           </div>
           <!-- Widget 3 END -->
         </div>
