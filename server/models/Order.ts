@@ -51,6 +51,20 @@ export class Order extends Firefly<Order> {
     // Create the order number based on the order.id from thrive, using the last 5 digits
     const orderNumber = `RED4-${order.id.slice(-8)}`;
 
+    const existingOrder = await Order.get(orderNumber);
+    if (existingOrder) {
+      if (existingOrder.status === 'completed') {
+        // If the order is already completed, return it
+        console.log(`Order ${orderNumber} already exists and is completed.`);
+        delete existingOrder.storage;
+        const authorizations = await existingOrder.getAuthorizations();
+        for (const auth of authorizations) {
+          delete auth.storage;
+        }
+        return [existingOrder, authorizations];
+      }
+    }
+
     // Create the order object using the Order class
     const newOrder = new Order({
       id: orderNumber,
@@ -59,7 +73,7 @@ export class Order extends Firefly<Order> {
       name: `${customer.first_name} ${customer.last_name}`.trim(),
       email: customer.email.toLowerCase(),
       slug: slug,
-      total: parseInt(order.total, 10),
+      total: parseInt(order.total) / 100,
       store: 'thrivecart',
       offer: order.charges[0].name,
     });
