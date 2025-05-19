@@ -3,30 +3,34 @@ title: Rails Revisited - Rediscover the Joy of Web Development
 summary: Return to the elegance and productivity of Ruby on Rails in a world of frontend framework fatigue.
 price: 99.00
 offer: "rails-revisited"
-stripe: "https://stripe.com"
+stripe: "https://sales.bigmachine.io/rails-revisited"
 ---
 
 ::sales-hero{image="https://placehold.co/800x400?text=Rails Revisited"}
+
 # Remember When Web Development Was Actually Fun?
 
 In a world of JavaScript fatigue and framework churn, there's something refreshingly rebellious about returning to a technology that just lets you build things. Ruby on Rails: no configuration hell, no dependency nightmares, just pure, productive joy.
 ::
 
 ::sales-person{image="https://placehold.co/800x400?text=Person"}
+
 ## Drowning in a Sea of JavaScript Frameworks?
 
 You've been there. We all have. Another day, another JavaScript framework to learn. Another migration strategy to plan. Another set of best practices that will be obsolete by the time you finish reading them. Meanwhile, all you really want to do is build something useful without spending weeks configuring your development environment.
 ::
 
 ::sales-problem{image="/images/doodles/cat.png"}
+
 ## The Modern Web Development Paradox
 
-The promise of modern web development was productivity. Instead, we got complexity. We've somehow convinced ourselves that spending 80% of our time configuring build tools and managing dependencies is just "the cost of doing business." 
+The promise of modern web development was productivity. Instead, we got complexity. We've somehow convinced ourselves that spending 80% of our time configuring build tools and managing dependencies is just "the cost of doing business."
 
 We've normalized the absurdity of needing three different package managers, a bundler with 200 plugins, and a dissertation-length configuration file just to render "Hello World" on a screen. The irony is that while we chase the next shiny framework, we're actually building less and enjoying it less too.
 ::
 
 ::sales-pain
+
 ## The Hidden Cost of Framework Fatigue
 
 This endless cycle doesn't just waste your time—it kills your creativity and passion for the craft. It transforms the joy of building into the drudgery of configuring. It replaces the satisfaction of shipping with the anxiety of keeping up.
@@ -35,6 +39,7 @@ And the real cost? How many brilliant web applications were never built because 
 ::
 
 ::sales-story
+
 ## My Own Return to Rails
 
 A few months ago, I needed to rebuild my site. I started doing what everyone does these days: researching the latest JavaScript frameworks, comparing build tools, setting up a complex frontend architecture.
@@ -45,6 +50,7 @@ That's when I remembered how it felt to build with Rails in the early days. How 
 ::
 
 ::sales-struggle
+
 ## The Frontend Framework Treadmill
 
 For years, I convinced myself that the constant churn was worth it. That learning React, then Vue, then Angular, then back to React with hooks, then Svelte—it was all necessary to stay "current."
@@ -55,6 +61,7 @@ I realized I had been running hard just to stay in place, chasing frameworks tha
 ::
 
 ::sales-solution
+
 ## And That's When I Rediscovered Rails
 
 And that's when I decided to rebuild my entire site with Ruby on Rails—not out of nostalgia, but out of a genuine desire to be productive again.
@@ -65,6 +72,7 @@ In just one weekend, I accomplished more with Rails than I had in weeks of front
 ::
 
 ::sales-ask
+
 ## Ready to Fall in Love with Web Development Again?
 
 If you're nodding along, feeling that familiar pain of "there must be a better way," then Rails Revisited was created specifically for you.
@@ -77,6 +85,7 @@ For just $99, you can access the complete Rails Revisited course and start build
 ::
 
 ::sales-assert
+
 ## What You'll Discover in "Rails Revisited"
 
 - **Build a complete, modern Rails 7 application from scratch** so you can see exactly how all the pieces fit together, which means you'll be confidently creating your own apps within days, not months
@@ -85,9 +94,10 @@ For just $99, you can access the complete Rails Revisited course and start build
 - **See exactly how I rebuilt my own production site** step by step so you can follow along with real-world decisions, which means learning not just the how but the why behind each architecture choice
 - **Understand how modern Rails integrates with CSS frameworks** like Tailwind so you can build beautiful interfaces without fighting your tools, which means creating polished UIs without the usual pain
 - **Learn proper testing patterns with RSpec and system tests** so you can ensure quality without endless test configuration, which means more confidence in your code with less overhead
-::
+  ::
 
 ::sales-affirm
+
 ### Your Investment Is Protected
 
 Not sure if Rails is right for your next project? I understand. That's why I offer a 30-day, no-questions-asked refund guarantee. Try Rails Revisited, and if you don't find yourself more productive and happier with your development workflow, simply let me know for a full refund.
@@ -99,4 +109,4 @@ Not sure if Rails is right for your next project? I understand. That's why I off
 > "As someone who started with JavaScript and had never used Rails before, I was skeptical about learning what seemed like a 'legacy' framework. This course changed everything for me. Now I reach for Rails first for any new project because I know I can actually finish what I start." — **Sarah L., Full Stack Developer**
 
 > "I've been watching the 'death of Rails' being predicted for a decade while quietly building and shipping profitable applications with it. Rob's course perfectly captures why Rails is still the most productive way to build for the web in 2025." — **Michael F., Senior Developer**
-::
+> ::

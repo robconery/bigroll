@@ -6,11 +6,15 @@ offer: imposter-second
 stripe: "https://buy.stripe.com/cN2dR4d9c7E42isfZ8"
 ---
 
-::sales-hero{image="/images/slides/imposter-second.jpg"}
+::hero{image="/images/slides/imposter-second.jpg"}
 
 # Don't Have a CS Degree and Feel Like You Should?
 
 Take a look around your office. 80% of your colleagues are silently stuck in crappy jobs earning far less than they should be. The other 20% are planning their exit to higher-paying positions this year. What's the difference? The 20% know their worth and aren't afraid to speak up. This book helps you join them.
+
+::big-button{link="https://buy.stripe.com/cN2dR4d9c7E42isfZ8" text="This Book Looks Like Fun"}
+::
+
 ::
 
 ::simple-title

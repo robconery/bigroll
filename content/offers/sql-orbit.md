@@ -3,7 +3,7 @@ title: PostgreSQL Fundamentals - Data Science from Outer Space
 summary: Master PostgreSQL through hands-on analysis of NASA's Cassini mission data, uncovering the mysteries of Saturn's moon Enceladus.
 price: 99.00
 offer: "sql-orbit"
-stripe: "https://stripe.com"
+stripe: "https://buy.stripe.com/9B66oGaez1VefPxczLdUY0c"
 ---
 
 ::hero{image="/images/slides/sql-orbit.jpg"}

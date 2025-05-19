@@ -11,6 +11,10 @@ stripe: "https://buy.stripe.com/28ofZcedg6A00akaEP"
 # Learning to Code Is Just the Beginning
 
 There's a rush that comes over you when you ship software that brings real value. That magic moment when you deliver something that makes an impact! If you're going to move up, however, **you need master much more than coding.**
+
+::big-button{link="https://buy.stripe.com/28ofZcedg6A00akaEP" text="I Need The Skills"}
+::
+
 ::
 
 ::simple-title
