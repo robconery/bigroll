@@ -161,81 +161,8 @@ useHead(() => ({
   ],
 }));
 </script>
-
-<style scoped>
-.post-content {
-  font-size: 1.1rem;
-  line-height: 1.7;
-}
-
-.featured-image img {
-  width: 100%;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  transition: transform 0.3s ease;
-}
-
-.featured-image {
-  overflow: hidden;
-  position: relative;
-}
-
-.featured-image::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.02));
-  transition: height 0.3s ease;
-}
-
-.featured-image:hover::after {
-  height: 100%;
-}
-
-.featured-image:hover img {
-  transform: scale(1.02);
-}
-
-.post-content :deep(h2),
-.post-content :deep(h3) {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.post-content :deep(p) {
-  margin-bottom: 1.25rem;
-}
-
-.post-content :deep(ul),
-.post-content :deep(ol) {
-  margin-bottom: 1.25rem;
-  padding-left: 1.5rem;
-}
-
-.post-content :deep(img) {
-  max-width: 100%;
-  height: auto;
-  margin: 1.5rem 0;
-  border-radius: 0.375rem;
-}
-
-.post-content :deep(pre) {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  overflow-x: auto;
-  margin-bottom: 1.5rem;
-}
-
-.post-content :deep(blockquote) {
-  border-left: 4px solid #dee2e6;
-  padding-left: 1rem;
-  margin-left: 0;
-  margin-right: 0;
-  font-style: italic;
-  color: #6c757d;
+<style>
+pre > code {
+  color: aliceblue !important;
 }
 </style>
