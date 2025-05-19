@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Analytics />
     <TopNav />
     <main class="position-relative py-8">
       <div class="container mx-auto w-2/3">
@@ -151,7 +152,7 @@
 
 <script setup>
 import { onMounted, onBeforeMount } from "vue";
-
+import { Analytics } from "@vercel/analytics/nuxt";
 // Use our simplified Firebase Auth composable
 const { user, authorizations, isLoading, logout, initAuthState } =
   useFirebaseAuth();
