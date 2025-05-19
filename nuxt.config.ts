@@ -75,7 +75,10 @@ export default defineNuxtConfig({
       ],
       script: [
         { src: 'https://code.jquery.com/jquery-3.6.0.js' },
-        { src: '/js/vendor/bootstrap/dist/js/bootstrap.bundle.min.js', defer: true },
+        {
+          src: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js",
+          type: "text/javascript",
+        },
         { src: '/js/vendor/sticky-js/sticky.min.js', defer: true },
         {
           src: 'https://www.googletagmanager.com/gtag/js?id=G-LRFHDFQ52H',
