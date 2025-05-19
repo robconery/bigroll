@@ -44,7 +44,7 @@
               <li class="nav-item">
                 <NuxtLink class="nav-link" to="/posts">Posts</NuxtLink>
               </li>
-              <div class="nav-item px-2" v-if="!isAdmin">
+              <div class="nav-item px-2">
                 <form class="position-relative" action="/search" method="get">
                   <input
                     class="form-control pe-5 bg-transparent"
@@ -61,79 +61,28 @@
                   </button>
                 </form>
               </div>
-              <!-- Auth links -->
-              <template v-if="user">
-                <!-- User avatar with dropdown -->
-                <li class="nav-item dropdown ms-2">
-                  <a
-                    class="avatar avatar-sm p-0"
-                    href="#"
-                    id="profileDropdown"
-                    role="button"
-                    data-bs-auto-close="outside"
-                    data-bs-display="static"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <img
-                      class="avatar-img rounded-circle"
-                      :src="userAvatar"
-                      alt="avatar"
-                    />
-                  </a>
-                  <ul
-                    class="dropdown-menu dropdown-animation dropdown-menu-end shadow pt-3"
-                    aria-labelledby="profileDropdown"
-                  >
-                    <!-- Avatar -->
-                    <li class="px-3">
-                      <div class="d-flex align-items-center">
-                        <!-- Avatar -->
-                        <div class="avatar me-3">
-                          <img
-                            class="avatar-img rounded-circle shadow"
-                            :src="userAvatar"
-                            alt="avatar"
-                          />
-                        </div>
-                        <div>
-                          <a class="h6" href="#">{{ userName }}</a>
-                          <p class="small m-0">{{ user.email }}</p>
-                        </div>
-                      </div>
-                      <hr />
-                    </li>
-                    <!-- Links -->
-                    <li>
-                      <NuxtLink class="dropdown-item" to="/dashboard">
-                        <i class="bi bi-person fa-fw me-2"></i>Dashboard
-                      </NuxtLink>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        @click.prevent="handleLogout"
-                      >
-                        <i class="bi bi-power fa-fw me-2"></i>Sign Out
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-              </template>
-              <!-- Guest links -->
-              <template v-else>
-                <li class="nav-item ms-2">
-                  <button
-                    class="btn btn-primary mb-0"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loginModal"
-                  >
-                    Login <i class="bi bi-box-arrow-in-right"></i>
-                  </button>
-                </li>
-              </template>
+
+              <li class="nav-item ms-2" v-if="user">
+                <NuxtLink class="btn btn-dark btn-sm mt-1 mb-0" to="/dashboard">
+                  <i class="fa fa-home"></i>
+                  Dashboard
+                </NuxtLink>
+              </li>
+              <li class="nav-item ms-2" v-if="user">
+                <a class="dropdown-item" href="#" @click.prevent="handleLogout">
+                  <i class="bi bi-power fa-fw me-2"></i>Log Out
+                </a>
+              </li>
+              <li class="nav-item ms-2" v-else>
+                <button
+                  class="btn btn-primary mb-0"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#loginModal"
+                >
+                  Login <i class="bi bi-box-arrow-in-right"></i>
+                </button>
+              </li>
             </ul>
           </div>
         </div>
