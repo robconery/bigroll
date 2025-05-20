@@ -40,15 +40,15 @@ export async function sendEmailWithDownloads(email: string) {
     to: email,
     subject: "Your Big Machine Downloads",
     html: `
-      <h1>Your Big Machine Downloads</h1>
-      <p>Hello!</p>
-      <p>Thank you for requesting your downloads. Here are the links to your purchased items:</p>
+      <h1>Here's Your Goodies!</h1>
+      <p>Below are the things that you bought from me (thank you!), I hope they're complete. If you have any issues at all, just reply to this email and I'll get you sorted as fast as possible.</p>
       <ul>
         ${linkHtml}
       </ul>
-      <p>If you're looking for access to video content, you can access it by logging into your account at <a href="https://bigmachine.io/login">our website</a>.</p>
-      <p>If you have any questions, please don't hesitate to contact us.</p>
-      <p>Best regards,<br>The Big Machine Team</p>
+      <p>If you're looking for access to video content, you can access it by logging into your account at <a href="https://bigmachine.io/">my website</a>.</p>
+      <p>If you have any questions, please don't hesitate to hit reply. I can usually get back to you within 24 hours..</p>
+      <p>Thanks so much,</p>
+      <p>Rob</p>
     `
   }
   
