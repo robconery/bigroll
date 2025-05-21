@@ -1,6 +1,6 @@
 import "dotenv/config" 
 import { Order } from '../models'
-import { defineEventHandler, readBody, createError, getHeader } from 'h3'
+import { defineEventHandler, readBody, createError, getHeader, readRawBody } from 'h3'
 import Stripe from 'stripe'
 import { getCheckoutSession } from "../lib/stripe"
 
@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 export default defineEventHandler(async (event) => {
   // Get the raw body and signature
-  const body = await readBody(event)
+  const body = await readRawBody(event)
   const signature = getHeader(event, 'stripe-signature')
   const out = {
     statusCode: 400,
@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
   } catch (err: any) {
     console.error(`Webhook signature verification failed: ${err.message}`)
     out.statusMessage = `Webhook signature verification failed: ${err.message}`
+    out.statusCode = 401
     return out;
   }
 
