@@ -4,9 +4,8 @@ import { getCheckoutSession } from '~/server/lib/stripe';
 
 describe('Stripe Order Processing', () => {
   let stripeData: any;
-  beforeAll(async () => { 
-    stripeData = await getCheckoutSession("cs_live_a1MkWlTbmVgxyTJEZqcCJTfaTu9cdmdJCaYqAM0PNNagT3bh8njue0WnUX");
-    console.log("Stripe Data:", stripeData);
+  beforeAll(async () => {
+    stripeData = await getCheckoutSession("cs_test_a1lfRMEZEVvw5rPsBK2twoY8PiSCEfVPT7TpJujGv9aLSvRFuzUSy9mnjN");
   });
 
   describe('saveStripeOrder - standard product', () => {
