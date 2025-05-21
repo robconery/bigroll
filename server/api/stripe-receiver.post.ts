@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Verify the event using the webhook secret
     stripeEvent = stripe.webhooks.constructEvent(
-      JSON.stringify(body),
+      body || "",
       signature,
       process.env.STRIPE_WEBHOOK_SECRET || ''
     )
