@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     try {
       //const session = stripeEvent.data.object as Stripe.Checkout.Session
       const session = getCheckoutSession(stripeEvent.data.object.id);
-      
+      console.log('Session:', session);
       // The updated Order.saveStripeOrder method only needs the session parameter
       await Order.saveStripeOrder(session);
       setResponseStatus(event, 200);
