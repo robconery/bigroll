@@ -42,6 +42,7 @@ if (post.value) {
 } else {
   //redirect to the 404 page
   //location.href = "/404";
+  await navigateTo("/404", { replace: true });
 }
 </script>
 
