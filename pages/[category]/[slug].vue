@@ -11,7 +11,7 @@
               <span class="text-muted">{{ formatDate(post.date) }}</span>
             </div>
             <h1 class="display-5 mb-3">{{ post.title }}</h1>
-            <p class="lead">{{ post.summary }}</p>
+            <p class="lead" v-html="post.summary"></p>
           </div>
 
           <!-- Featured Image -->
