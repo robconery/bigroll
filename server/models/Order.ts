@@ -1,5 +1,5 @@
 import { Firefly } from '../lib/firefly';
-import { Authorization, Offer, Product } from './';
+import { Authorization, Offer, Product, User } from './';
 import assert from 'assert';
 import { recordPurchase } from '../lib/convertkit';
 /**
@@ -111,6 +111,13 @@ export class Order extends Firefly<Order> {
 
     //ping convertkit with the order details
     try {
+      const user = new User({
+        id: newOrder.email,
+        email: newOrder.email,
+        name: newOrder.name || ''
+      });
+      await user.save();
+
       await recordPurchase(newOrder);
     } catch (error) {
       console.error('Error recording purchase in ConvertKit:', error);
@@ -200,6 +207,13 @@ export class Order extends Firefly<Order> {
 
     //ping convertkit with the order details
     try {
+      //add a user record
+      const user = new User({
+        id: newOrder.email,
+        email: newOrder.email,
+        name: newOrder.name || ''
+      });
+      await user.save();
       await recordPurchase(newOrder);
     } catch (error) {
       console.error('Error recording purchase in ConvertKit:', error);

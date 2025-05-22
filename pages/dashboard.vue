@@ -22,6 +22,9 @@
               <h1 class="mb-2">
                 {{ userModel?.name || user?.displayName || user?.email }}
               </h1>
+              <p v-if="!userModel?.name" class="text-muted">
+                {{ userModel?.email || user?.email }}
+              </p>
             </div>
 
             <!-- Subscription section for active subscribers -->

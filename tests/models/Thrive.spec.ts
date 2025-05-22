@@ -3,7 +3,7 @@ import { Order, Authorization, Offer } from '../../server/models';
 //import the thrive.json data file
 import thriveOrder from '../support/thrive.json';
 
-describe('Stripe Order Processing', () => {
+describe('Thrive Order Processing', () => {
   let order: Order;
   let authorizations: Authorization[];
   beforeAll(async () => {

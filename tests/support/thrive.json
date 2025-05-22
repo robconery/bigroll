@@ -2,7 +2,7 @@
   "mode": "test",
   "event": "order.success",
   "order": {
-    "id": "20283766",
+    "id": "2028KSLSSKAKGLWN",
     "tax": "null",
     "date": "2025-05-21 18:22:01",
     "total": "2800",
@@ -44,7 +44,7 @@
   "customer": {
     "id": "429583657671852158",
     "name": "Joy Bubble",
-    "email": "robconery@gmail.com",
+    "email": "robconery+chonks@gmail.com",
     "origin": "vanity",
     "address": {
       "zip": "94939",
