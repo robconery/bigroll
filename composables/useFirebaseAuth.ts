@@ -56,15 +56,17 @@ export const useFirebaseAuth = () => {
       if (firebaseUser.email) {
         try {
           // Get user from Firestore
-          const fetchedUser = await getUserByEmail(firebaseUser.email);
+          //const fetchedUser = await getUserByEmail(firebaseUser.email);
           
-          if (fetchedUser) {
-            userModel.value = fetchedUser;
+          //if (fetchedUser) {
+            userModel.value = firebaseUser;
             
             // Fetch authorizations
-            const fetchedAuths = await getAuthorizations(fetchedUser);
+            const fetchedAuths = await getAuthorizations(firebaseUser);
             authorizations.value = fetchedAuths;
             
+            console.log('Fetched authorizations:', fetchedAuths);
+
             // Associate authorizations with user
             userModel.value.authorizations = fetchedAuths;
             
@@ -75,17 +77,17 @@ export const useFirebaseAuth = () => {
             } else {
               subscription.value = null;
             }
-          } else {
-            // Create a new user model if not found in Firestore
-            userModel.value = {
-              email: firebaseUser.email,
-              uid: firebaseUser.uid,
-              name: firebaseUser.displayName || undefined,
-              authorizations: []
-            };
-            authorizations.value = [];
-            subscription.value = null;
-          }
+          // } else {
+          //   // Create a new user model if not found in Firestore
+          //   userModel.value = {
+          //     email: firebaseUser.email,
+          //     uid: firebaseUser.uid,
+          //     name: firebaseUser.displayName || undefined,
+          //     authorizations: []
+          //   };
+          //   authorizations.value = [];
+          //   subscription.value = null;
+          // }
         } catch (e) {
           console.error('Error fetching user data:', e);
         }
