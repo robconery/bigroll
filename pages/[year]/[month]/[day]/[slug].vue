@@ -25,8 +25,20 @@ const { data: post } = await useAsyncData("posts-wp", () => {
 });
 
 if (post.value) {
+  await navigateTo(
+    `/${post.value.categories.toLowerCase()}/${post.value.slug}`
+  );
   //redirect to the post page
-  location.href = `/${post.value.categories.toLowerCase()}/${post.value.slug}`;
+  // if (import.meta.env.SSR) {
+  //   //server side
+  //   return {
+  //     redirect: `/${post.value.categories.toLowerCase()}/${post.value.slug}`,
+  //   };
+  // } else {
+  //   location.href = `/${post.value.categories.toLowerCase()}/${
+  //     post.value.slug
+  //   }`;
+  // }
 } else {
   //redirect to the 404 page
   //location.href = "/404";
