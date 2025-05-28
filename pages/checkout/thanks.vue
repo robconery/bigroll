@@ -156,7 +156,6 @@ async function sendEmail() {
     console.error(error.value);
     sending.value = false;
   } else {
-    console.log(data.value);
     sending.value = false;
     sent.value = true;
   }

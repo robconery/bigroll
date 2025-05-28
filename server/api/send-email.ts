@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const res = await sendEmailWithDownloads(email);
+    console.log('Email sent successfully:', res);
     return { success: true };
   } catch (err) {
     console.error("Error sending email:", err);
