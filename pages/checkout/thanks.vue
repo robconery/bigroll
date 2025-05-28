@@ -134,6 +134,7 @@ const route = useRoute();
 const id = route.query.id;
 let sending = ref(false);
 let sent = ref(false);
+
 // use useFetch to get data from the server
 const { data, error } = await useFetch(`/api/checkout/?id=${id}`, {
   method: "GET",
@@ -141,14 +142,14 @@ const { data, error } = await useFetch(`/api/checkout/?id=${id}`, {
     "Content-Type": "application/json",
   },
 });
-console.log(data.value);
+
 async function sendEmail() {
   // send an email to the user with the download link
   sending.value = true;
   const { data, error } = await useFetch(`/api/send-email`, {
     method: "POST",
     body: {
-      id: id,
+      id: data.value.order.email,
     },
   });
   if (error.value) {

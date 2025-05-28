@@ -21,6 +21,7 @@
     "axios": "^1.9.0",
     "canvas-confetti": "^1.9.3",
     "chalk": "^5.4.1",
+    "console-table-printer": "^2.13.0",
     "dotenv": "^16.5.0",
     "firebase": "^10.1.0",
     "firebase-admin": "^11.10.1",
