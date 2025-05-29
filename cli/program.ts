@@ -1,6 +1,6 @@
 //set up the default program
 import "dotenv/config";
-import { Order, Authorization, User, Subscription } from "../server/models/";
+import { Order, Authorization, User, Subscription, Offer } from "../server/models/";
 import { formatDate, header, keyValue, divider, formatStatus } from "./util";
 import { program } from "commander";
 import chalk from "chalk";
@@ -29,6 +29,44 @@ program.command("order [number]")
       console.log(order._toFirestore());
     } catch (error) {
       console.error("Error fetching order information:", error);
+    }
+  });
+
+program.command("order:create [email] [number] [slug] [total]")
+  .description("Create a new order")
+  .action(async (email, number, slug, total) => {
+    try {
+      if (!email || !number || !slug || !total) {
+        console.log(chalk.red.bold('Error: email, number, slug, total are required'));
+        return;
+      }
+
+      const [order, authorizations] = await Order.createNewOrder({
+        email: email.toLowerCase(),
+        number: number,
+        slug: slug,
+        total: parseFloat(total),
+        date: new Date().toISOString(),
+        store: "rob",
+      });
+      //authorize
+      console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Order created: ${order.number}`));
+      console.log(chalk.cyan.bold('Authorizations:'));
+      if (authorizations.length > 0) {
+        for (const auth of authorizations) {
+          console.log(chalk.bold.green('➤ ') + chalk.bold.white(auth.sku));
+          console.log(keyValue('  Date', formatDate(auth.date), 2));
+          if (auth.order) console.log(keyValue('  Order', auth.order, 2));
+          console.log(divider());
+        }
+      }
+      else {
+        console.log(chalk.italic('No authorizations created for this order'));
+      }
+      // Send download links to the user
+
+    } catch (error) {
+      console.error("Error creating order:", error);
     }
   });
 

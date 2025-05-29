@@ -45,6 +45,67 @@ export class Order extends Firefly<Order> {
   }
     
 
+  static async createNewOrder(data: Partial<Order>): Promise<[Order, Authorization[]]> {
+    // Ensure required fields are present
+    assert(data.email, 'Email is required');
+    assert(data.number, 'Order number is required');
+    assert(data.slug, 'Slug is required');
+    assert(data.total !== undefined, 'Total is required');
+    // look up the offer by slug
+    const offer = await Offer.find({ slug: data.slug });
+    if (!offer) {
+      throw new Error(`Offer with slug ${data.slug} not found`);
+    }
+    //save the order 
+    const order = new Order({
+      id: data.number,
+      number: data.number,
+      date: data.date || new Date().toISOString(),
+      email: data.email.toLowerCase(),
+      name: data.name,
+      slug: data.slug,
+      offer: offer.name,
+      store: data.store || 'unknown',
+      total: parseFloat(data.total.toString()),
+      status: 'pending', // Default status
+    });
+    await order.save();
+    const products = await offer.getProducts();
+    if (!products || products.length === 0) {
+      console.error(`No products found for offer: ${offer.slug}`);
+      return [order, []];
+    }
+    //authorize each product in the order
+    const authorizations: Authorization[] = [];
+    for (const product of products) {
+      const authorization = new Authorization({
+        email: order.email.toLowerCase(),
+        sku: product.sku,
+        date: order.date_iso8601,
+        order: order.number,
+        offer: offer.slug,
+      });
+      await authorization.save();
+      authorizations.push(authorization);
+    }
+    order.status = 'completed';
+    await order.save();
+    //ping convertkit with the order details
+    try {
+      const user = new User({
+        id: order.email,
+        email: order.email,
+        name: order.name || ''
+      });
+      await user.save();
+      await recordPurchase(order);
+    }
+    catch (error) {
+      console.error('Error recording purchase in ConvertKit:', error);
+    }
+    return [order, authorizations];
+  };
+
   static async saveThriveOrder(data: any): Promise<[Order, Authorization[]]> {
     const { order, customer, base_product_label: slug } = data;
 
