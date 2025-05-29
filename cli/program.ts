@@ -4,11 +4,33 @@ import { Order, Authorization, User, Subscription } from "../server/models/";
 import { formatDate, header, keyValue, divider, formatStatus } from "./util";
 import { program } from "commander";
 import chalk from "chalk";
+import { sendEmailWithDownloads } from "~/server/lib/email";
 
 const thriveAPI = "https://thrivecart.com/api/external/";
 
 program.version("1.0.0");
 program.description("A CLI for the project");
+
+program.command("order [number]")
+  .description("Get order information by order number")
+  .action(async (number) => {
+    try {
+      if (!number) {
+        console.log(chalk.red.bold('Error: Order number is required'));
+        return;
+      }
+      // Fetch order by number
+      const order = await Order.find({number: number});
+      if (!order) {
+        console.log(chalk.red.bold(`Error: Order with number ${number} not found`));
+        return;
+      }
+      console.log('Order Information:');
+      console.log(order._toFirestore());
+    } catch (error) {
+      console.error("Error fetching order information:", error);
+    }
+  });
 
 //create a routine that finds a customer based on email and orders
 program
@@ -42,7 +64,6 @@ program
       if (orders.length > 0) {
         for (const order of orders) {
           console.log(chalk.bold.yellow('🛒 ') + chalk.bold.white(`${order.number}`));
-          console.log(keyValue('  Date', formatDate(order.date), 2));
           console.log(keyValue('  Offer', order.offer || 'N/A', 2));
           if (order.status) console.log(keyValue('  Slug', order.slug, 2));
           if (order.total) console.log(keyValue('  Total', `$${order.total}`, 2));
@@ -115,6 +136,82 @@ program
       }
     } catch (error) {
       console.error("Error fetching ThriveCart orders:", error);
+    }
+  });
+
+
+program.command("change-email [emails] [newEmail]")
+  .description("Change the email of a user")
+  .action(async (emails, newEmail) => {
+    try {
+      if (!newEmail) {
+        console.log(chalk.red.bold('Error: New email and at least one old email are required'));
+        return;
+      }
+      const oldEmails = emails.split(",");
+      if (oldEmails.length === 0) {
+        console.log(chalk.red.bold('Error: At least one old email is required'));
+        return;
+      }
+      for (let email of oldEmails) {
+        email = email.trim().toLowerCase();
+        if (!email) {
+          console.log(chalk.red.bold(`Error: Invalid email provided: ${email}`));
+          return;
+        }
+
+        //     // Find the user by their original email
+        const user = await User.find({ email: email });
+        if (user) {
+          // Update user email
+          user.email = newEmail;
+          await user.save();
+          console.log('User email updated:', email, newEmail);
+        }
+        // Update all authorizations with the new email
+        const authorizations = await Authorization.filter({ email: email });
+        for (const auth of authorizations) {
+          auth.email = newEmail;
+          // Since the ID is based on email-sku, we need to update that too
+          auth.id = `${newEmail}-${auth.sku}`;
+          auth.date = new Date().toISOString(); // Update date to current time
+          await auth.save();
+          console.log('Authorization updated:', email, newEmail, auth.id);
+        }
+        const orders = await Order.filter({ email: email });
+        for (const order of orders) {
+          order.email = newEmail;
+
+          await order.save();
+          console.log('Order updated:', email, newEmail, order.number);
+        }
+
+        // Update subscription if exists
+        const subscription = await Subscription.find({ email: email });
+        if (subscription) {
+          subscription.email = newEmail;
+          await subscription.save();
+          console.log('Subscription updated:', email, newEmail);
+        }
+      }
+    } catch (error) {
+      console.error("Error changing email:", error);
+    }
+  });
+
+program.command("send-downloads [email]")
+  .description("Send download links to a user's email")
+  .action(async (email) => {
+    try {
+      if (!email) {
+        console.log(chalk.red.bold('Error: Email is required'));
+        return;
+      }
+      await sendEmailWithDownloads(email);
+      console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Download links sent to ${email}`));
+
+    } catch (error) {
+      console.error("Error sending downloads:", error);
     }
   });
 

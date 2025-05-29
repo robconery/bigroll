@@ -142,12 +142,11 @@ export class Firefly<T extends Firefly<T>> {
   async delete() {
     return db.delete(this.collection(), this.id.toString());
   }
-
   /**
    * Internal method to convert the model to plain object for Firestore storage
    * This replaces the toFirestore method in individual models
    */
-  protected _toFirestore(): Record<string, any> {
+  _toFirestore(): Record<string, any> {
     if (this.storage) {
       delete this.storage; // Remove the storage property if it exists
     }

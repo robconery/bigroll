@@ -79,44 +79,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Expired subscription notice -->
-            <div
-              v-if="subscription && !isSubscriptionActive"
-              class="container p-0"
-            >
-              <div class="row">
-                <div class="col-12 position-relative z-index-1">
-                  <!-- Similar decorative elements as above -->
-                  <div
-                    class="bg-grad-pink rounded position-relative z-index-n1 overflow-hidden p-4"
-                  >
-                    <div
-                      class="row g-3 align-items-center justify-content-lg-end position-relative py-4"
-                    >
-                      <div class="col">
-                        <h3 class="text-white">
-                          Your Subscription has Expired
-                        </h3>
-                        <p class="text-white mb-0">
-                          Your {{ subscription.plan }} subscription ended on
-                          {{ formatDate(subscription.current_period_end) }}.
-                          Thanks so much for your past support! Would love to
-                          have you back! 🙌
-                        </p>
-                        <p class="mt-3 text-white">
-                          <a
-                            href="https://billing.stripe.com/p/login/28oaFsd7PgdXafCeUU"
-                            class="btn btn-primary btn-outline-white mb-0"
-                            >Reactivate Subscription</a
-                          >
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="col-md-6 col-lg-12">
