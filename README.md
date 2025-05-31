@@ -1,75 +1,11 @@
-# Nuxt Minimal Starter
+# My Site, Made Mostly (95%) by Copilot
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+I rolled my Rails site to Nuxt 3 + Nuxt Content and had so, so much fun! Wanted to share this with you...
 
-## Setup
+## Concerns
 
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- "It's going to cost jobs"
+- "There will be no more senior developers / erosion of skills"
+- "The code generated sucks (hallucinations, incorrect, buggy) and no one will know that"
+- "Blind trust and detachment" (aka the new Copy/Paste from StackOverflow, but easier)
+- "It can't possibly understand the domain I'm working in"

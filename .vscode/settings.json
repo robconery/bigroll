@@ -1,0 +1,7 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Fit the commit message on one line. Add a dad joke and lots of emoji"
+    }
+  ],
+}

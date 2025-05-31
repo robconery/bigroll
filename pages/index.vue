@@ -259,7 +259,9 @@
 
 <script setup>
 const route = useRoute();
+
 const { data: books } = await useAsyncData("books-list", () => {
+  //Copilot got this WRONG
   return queryCollection("books").all();
 });
 

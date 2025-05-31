@@ -7,7 +7,7 @@ import chalk from "chalk";
 import { sendEmailWithDownloads } from "~/server/lib/email";
 
 const thriveAPI = "https://thrivecart.com/api/external/";
-
+ 
 program.version("1.0.0");
 program.description("A CLI for the project");
 
