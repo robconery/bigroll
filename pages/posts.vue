@@ -6,8 +6,11 @@
         <div class="row justify-content-center mt-lg-5">
           <div class="col-xl-8">
             <p class="lede">
-              Thoughts, tutorials, and insights about web development,
-              programming, and technology.
+              Here is an archive of my blog posts before I created
+              <a href="https://a.bigmachine.io">my newsletter</a>. If you want
+              to see more recent content, head over there and sign up! I also
+              post more personal things at
+              <a href="https://robconery.com">robconery.com</a>
             </p>
           </div>
         </div>
