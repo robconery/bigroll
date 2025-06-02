@@ -13,53 +13,38 @@
         </div>
 
         <div
-          class="mt-4"
-          v-for="(postsInCategory, category) in postsByCategory"
-          :key="category"
+          class="mt-5"
+          v-for="[year, postsInYear] in Object.entries(postsByYear).reverse()"
+          :key="year"
         >
-          <h2 class="mb-4">{{ category }}</h2>
-          <div class="row g-4">
-            <div
-              v-for="post in postsInCategory"
+          <h2 class="mb-4 border-bottom pb-2">{{ year }}</h2>
+          <ul class="list-unstyled">
+            <li
+              v-for="post in postsInYear"
               :key="post._path"
-              class="col-12 mb-4"
+              class="mb-4 pb-3 border-bottom border-light"
             >
-              <div
-                class="card card-hover-shadow h-100 border-0 rounded-4 shadow"
-              >
-                <div class="row g-0">
-                  <!-- Post content -->
-                  <div class="col-md-12">
-                    <div class="card-body">
-                      <!-- Post header -->
-                      <div class="d-flex align-items-center mb-2">
-                        <div class="badge bg-primary me-2">
-                          {{ post.categories }}
-                        </div>
-                        <small class="text-muted">{{
-                          formatDate(post.date)
-                        }}</small>
-                      </div>
-                      <!-- Title -->
-                      <h5 class="card-title">
-                        <NuxtLink
-                          :to="`/${post.categories.toLowerCase()}/${post.slug}`"
-                          class="stretched-link text-decoration-none"
-                        >
-                          {{ post.title }}
-                        </NuxtLink>
-                      </h5>
-                      <p class="card-text mb-3" v-html="post.summary"></p>
-                    </div>
-                  </div>
-                </div>
+              <div class="mb-2">
+                <h5 class="mb-2 d-flex align-items-center">
+                  <NuxtLink
+                    :to="`/${post.categories.toLowerCase()}/${post.slug}`"
+                    class="text-decoration-none me-3"
+                  >
+                    {{ post.title }}
+                  </NuxtLink>
+                  <span class="badge bg-primary">
+                    {{ post.categories }}
+                  </span>
+                </h5>
+                <p class="text-dark mb-2" v-html="post.summary"></p>
+                <small class="text-muted">{{ formatDate(post.date) }}</small>
               </div>
-            </div>
-          </div>
+            </li>
+          </ul>
         </div>
 
         <div
-          v-if="Object.keys(postsByCategory).length === 0"
+          v-if="Object.keys(postsByYear).length === 0"
           class="text-center py-5"
         >
           <p class="fs-5">No posts available yet. Check back soon!</p>
@@ -75,25 +60,33 @@ const { data: posts } = await useAsyncData("posts-all", () => {
   return queryCollection("posts").all();
 });
 
-// Group posts by category
-const postsByCategory = computed(() => {
+// Group posts by year
+const postsByYear = computed(() => {
   if (!posts.value) return {};
 
   const grouped = {};
   posts.value.forEach((post) => {
-    const category = post.categories || "Uncategorized";
-    if (!grouped[category]) {
-      grouped[category] = [];
+    const year = new Date(post.date).getFullYear().toString();
+    if (!grouped[year]) {
+      grouped[year] = [];
     }
-    grouped[category].push(post);
+    grouped[year].push(post);
   });
 
-  // Sort posts within each category by date (newest first)
-  Object.keys(grouped).forEach((category) => {
-    grouped[category].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Sort posts within each year by date (newest first)
+  Object.keys(grouped).forEach((year) => {
+    grouped[year].sort((a, b) => new Date(b.date) - new Date(a.date));
   });
 
-  return grouped;
+  // Sort years in descending order (newest first)
+  const sortedGrouped = {};
+  const years = Object.keys(grouped).map((year) => parseInt(year, 10));
+  years.sort((a, b) => b - a); // Sort numerically, descending order
+  years.forEach((year) => {
+    sortedGrouped[year.toString()] = grouped[year.toString()];
+  });
+
+  return sortedGrouped;
 });
 
 // Format date for display

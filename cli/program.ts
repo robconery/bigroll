@@ -11,6 +11,28 @@ const thriveAPI = "https://thrivecart.com/api/external/";
 program.version("1.0.0");
 program.description("A CLI for the project");
 
+program.command("offers")
+  .description("List all offers")
+  .action(async () => {
+    try {
+      const offers = await Offer.all();
+      console.log(header(`Offers (${offers.length})`));
+      if (offers.length > 0) {
+        for (const offer of offers) {
+          console.log(chalk.bold.blue('📦 ') + chalk.bold.white(offer.name));
+          console.log(keyValue('  Slug', offer.slug, 2));
+          console.log(keyValue('  Price', `$${offer.price}`, 2));
+          console.log(keyValue('  Deliverables', offer.deliverables.join(', '), 2));
+          console.log(divider());
+        }
+      } else {
+        console.log(chalk.italic('No offers found'));
+      }
+    } catch (error) {
+      console.error("Error fetching offers:", error);
+    }
+  });
+
 program.command("order [number]")
   .description("Get order information by order number")
   .action(async (number) => {
@@ -67,6 +89,41 @@ program.command("order:create [email] [number] [slug] [total]")
 
     } catch (error) {
       console.error("Error creating order:", error);
+    }
+  });
+
+program.command("grant [email] [slug]")
+  .description("Grant a user an authorization for an offer")
+  .action(async (email, slug) => {
+    try {
+      if (!email || !slug) {
+        console.log(chalk.red.bold('Error: email and slug are required'));
+        return;
+      }
+      // Fetch the offer by slug
+      const offer = await Offer.find({ slug: slug });
+      if (!offer) {
+        console.log(chalk.red.bold(`Error: Offer with slug ${slug} not found`));
+        return;
+      }
+      // Create a new authorization
+      for (let sku of offer.deliverables) {
+        const id = `${email.toLowerCase()}-${sku}`;
+        const authorization = await Authorization.create({
+          id,
+          email: email.toLowerCase(),
+          sku: sku,
+          date: new Date().toISOString(),
+          order: null, // No order associated yet
+          store: "rob",
+        });
+        console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Authorization granted for ${id}`));
+      }
+
+      
+      console.log(divider());
+    } catch (error) {
+      console.error("Error granting authorization:", error);
     }
   });
 

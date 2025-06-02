@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "deploy": "nuxt build && firebase deploy",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "update-post-dates": "node scripts/update-post-dates.js"
   },
   "dependencies": {
     "@nuxt/content": "^3.5.1",
