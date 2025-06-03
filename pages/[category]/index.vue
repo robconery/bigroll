@@ -20,21 +20,19 @@
 
               <!-- Title -->
               <h1 class="display-4 fw-bold mb-4">
-                <span class="phased">Blog Archive</span>
+                <span class="phased">{{ categoryDisplayName }} Posts</span>
               </h1>
 
               <!-- Subtitle -->
               <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7">
                   <p class="lead fs-5 text-dark-emphasis mb-4">
-                    A collection of my thoughts, tutorials, and insights about
-                    web development, programming, and technology. For more
-                    recent content, check out
-                    <a
-                      href="https://a.bigmachine.io"
-                      class="text-primary fw-semibold text-decoration-none"
-                      >my newsletter</a
-                    >.
+                    All posts categorized as
+                    <span
+                      class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill fw-semibold"
+                    >
+                      {{ categoryDisplayName }}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -58,6 +56,14 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Back to all posts link -->
+              <div class="mt-4">
+                <NuxtLink to="/posts" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-arrow-left me-2"></i>
+                  View All Posts
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -112,19 +118,18 @@
                     <div class="card-body p-4">
                       <!-- Category Badge -->
                       <div class="mb-3">
-                        <NuxtLink
-                          :to="`/${post.categories.toLowerCase()}`"
-                          class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill text-decoration-none"
+                        <span
+                          class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill"
                         >
                           {{ post.categories }}
-                        </NuxtLink>
+                        </span>
                       </div>
 
                       <!-- Title -->
                       <h4 class="card-title mb-3 lh-base">
                         <NuxtLink
                           :to="`/${post.categories.toLowerCase()}/${post.slug}`"
-                          class="text-decoration-none text-dark"
+                          class="text-decoration-none text-dark stretched-link"
                         >
                           {{ post.title }}
                         </NuxtLink>
@@ -160,8 +165,11 @@
                   class="bi bi-journal-text display-1 text-muted opacity-50"
                 ></i>
               </div>
-              <h3 class="text-muted mb-3">No posts available yet</h3>
-              <p class="text-muted">Check back soon for new content!</p>
+              <h3 class="text-muted mb-3">No posts found in this category</h3>
+              <p class="text-muted">
+                Try browsing other categories or check out
+                <NuxtLink to="/posts" class="text-primary">all posts</NuxtLink>.
+              </p>
             </div>
           </div>
         </div>
@@ -171,17 +179,21 @@
 </template>
 
 <script setup>
-// Fetch all posts
-const { data: posts } = await useAsyncData("posts-all", () => {
-  return queryCollection("posts").all();
+// Get the tag from the route
+const route = useRoute();
+const category = route.params.category;
+
+// 🏷️ Fetch posts filtered by category
+const { data: posts } = await useAsyncData(`posts-category-${category}`, () => {
+  return queryCollection("posts").where("categories", "=", category).all();
 });
 
-// Total posts count for hero stats
+// 📊 Total posts count for hero stats
 const totalPosts = computed(() => {
   return posts.value ? posts.value.length : 0;
 });
 
-// Group posts by year
+// 📅 Group posts by year
 const postsByYear = computed(() => {
   if (!posts.value) return {};
 
@@ -210,7 +222,12 @@ const postsByYear = computed(() => {
   return sortedGrouped;
 });
 
-// Format date for display
+// 🏷️ Format category name for display (capitalize first letter)
+const categoryDisplayName = computed(() => {
+  return category.charAt(0).toUpperCase() + category.slice(1);
+});
+
+// 📅 Format date for display
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString("en-US", {
@@ -220,13 +237,18 @@ const formatDate = (dateString) => {
   });
 };
 
+// 🔍 Handle case where category doesn't exist
+if (!posts.value || posts.value.length === 0) {
+  // Don't throw 404, just show empty state
+  console.log(`No posts found for category: ${category}`);
+}
+
 useHead({
-  title: "Blog Posts",
+  title: `${categoryDisplayName.value} Posts - Blog`,
   meta: [
     {
       name: "description",
-      content:
-        "Thoughts, tutorials, and insights about web development, programming, and technology.",
+      content: `All blog posts categorized as ${categoryDisplayName.value}. Explore articles about ${categoryDisplayName.value} including tutorials, insights, and practical examples.`,
     },
   ],
 });
