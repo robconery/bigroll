@@ -11,7 +11,8 @@
     "deploy": "nuxt build && firebase deploy",
     "test": "jest",
     "test:watch": "jest --watch",
-    "update-post-dates": "node scripts/update-post-dates.js"
+    "update-post-dates": "node scripts/update-post-dates.js",
+    "rename-posts": "tsx scripts/rename-posts-by-date.ts"
   },
   "dependencies": {
     "@nuxt/content": "^3.5.1",
