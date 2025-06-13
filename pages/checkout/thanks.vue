@@ -72,7 +72,7 @@
                   <h5 class="p-0 m-0">{{ item.name }}</h5>
                   <hr />
 
-                  <div v-if="item.download" class="mt-2">
+                  <div v-if="item.link" class="mt-2">
                     <p class="fs-6 mb-0">
                       <i>{{ item.file }}</i>
                     </p>
@@ -117,6 +117,16 @@
                       <!-- Info -->
                       Email sent! You should get it in a minute.
                     </div>
+                    <div
+                      class="alert alert-danger fade show mt-4 mb-3 rounded-3 fs-6"
+                      role="alert"
+                      v-if="errorMessage"
+                    >
+                      <!-- Avatar -->
+                      <i class="icon-lg bi bi-hand-thumbs-down"></i>
+                      <!-- Info -->
+                      {{ errorMessage }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -134,7 +144,8 @@ const route = useRoute();
 const id = route.query.id;
 let sending = ref(false);
 let sent = ref(false);
-
+let order = null;
+let errorMessage = ref("");
 // use useFetch to get data from the server
 const { data, error } = await useFetch(`/api/checkout/?id=${id}`, {
   method: "GET",
@@ -143,22 +154,34 @@ const { data, error } = await useFetch(`/api/checkout/?id=${id}`, {
   },
 });
 
+if(data && data.value && data.value.order) {
+  order = data.value.order;
+ 
+}
 async function sendEmail() {
   // send an email to the user with the download link
   sending.value = true;
-  const { data, error } = await useFetch(`/api/send-email`, {
-    method: "POST",
-    body: {
-      id: data.value.order.email,
-    },
-  });
-  if (error.value) {
-    console.error(error.value);
+  try{
+    const { data, error } = await $fetch(`/api/send-email`, {
+      method: "POST",
+      body: {
+        email: order.email,
+      },
+    });
     sending.value = false;
-  } else {
+    if (error) {
+      console.error(error);
+      errorMessage.value = error.message || "Failed to send email";
+
+    } else {
+      sent.value = true;
+    }
+  }catch (e) {
+    console.error(e);
     sending.value = false;
-    sent.value = true;
+    return;
   }
+
 }
 </script>
 

@@ -91,6 +91,44 @@ program.command("order:create [email] [number] [slug] [total]")
       console.error("Error creating order:", error);
     }
   });
+program.command("order:authorize [number]")
+  .description("Create a new order")
+  .action(async (number) => {
+    try {
+      if (!number) {
+        console.log(chalk.red.bold('Error:  are required'));
+        return;
+      }
+      // Fetch the order by number
+      const order = await Order.find({ number: number });
+      if (!order) {
+        console.log(chalk.red.bold(`Error: Order with number ${number} not found`));
+        return;
+      }
+      // Fetch the offer by slug
+      const offer = await Offer.find({ slug: order.slug });
+      if (!offer) {
+        console.log(chalk.red.bold(`Error: Offer with slug ${order.slug} not found`));
+        return;
+      }
+      // Create a new authorization for each deliverable
+      for (let sku of offer.deliverables) {
+        const id = `${order.email.toLowerCase()}-${sku}`;
+        const authorization = await Authorization.create({
+          id,
+          email: order.email.toLowerCase(),
+          sku: sku,
+          date: new Date().toISOString(),
+          order: order.number, // Associate with the order
+          store: "rob",
+        });
+        console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Authorization granted for ${id}`));
+      }
+      console.log(divider());
+    } catch (error) {
+      console.error("Error authorizing order:", error);
+    }
+  });
 
 program.command("grant [email] [slug]")
   .description("Grant a user an authorization for an offer")

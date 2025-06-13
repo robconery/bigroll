@@ -197,20 +197,25 @@ export class Order extends Firefly<Order> {
  // Generate a unique order number
     const orderNumber = `RED4-${session.id.slice(-8)}`;
     
-
+    console.log('Looking up order:', orderNumber);
     //do we have an order already? that's completed?
-    const existingOrder = await Order.get(orderNumber);
-    if (existingOrder) {
-      if (existingOrder.status === 'completed') {
-        // If the order is already completed, return it
-        console.log(`Order ${orderNumber} already exists and is completed.`);
-        delete existingOrder.storage;
-        const authorizations = await existingOrder.getAuthorizations();
-        for (const auth of authorizations) {
-          delete auth.storage;
+    try{
+      const existingOrder = await Order.get(orderNumber);
+      if (existingOrder) {
+        console.log('Found existing order:', existingOrder.number);
+        if (existingOrder.status === 'completed') {
+          // If the order is already completed, return it
+          console.log(`Order ${orderNumber} already exists and is completed.`);
+          delete existingOrder.storage;
+          const authorizations = await existingOrder.getAuthorizations();
+          for (const auth of authorizations) {
+            delete auth.storage;
+          }
+          return [existingOrder, authorizations];
         }
-        return [existingOrder, authorizations];
       }
+    }catch(error){
+      console.error('Error checking existing order:', error);
     }
 
     // We've already validated that customer_email exists before calling this method
@@ -228,6 +233,7 @@ export class Order extends Firefly<Order> {
       total: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
       status: 'pending'
     });
+    console.log('saving new order:', newOrder);
     await newOrder.save();
     const authorizations: Authorization[] = [];
 
@@ -247,7 +253,7 @@ export class Order extends Firefly<Order> {
           order: orderNumber,
           offer: sku
         });
-
+        console.log('Creating authorization for SKU:', sku);
         await authorization.save();
         if (file) {
           const downloadUrl = await authorization.getDownloadUrl();
@@ -264,6 +270,7 @@ export class Order extends Firefly<Order> {
     newOrder.slug = authorizations.map(auth => auth.sku).join(', ');
     newOrder.status = 'completed';
     
+    console.log('Finalizing order:', newOrder.number);
     await newOrder.save();
 
     //ping convertkit with the order details
@@ -275,6 +282,8 @@ export class Order extends Firefly<Order> {
         name: newOrder.name || ''
       });
       await user.save();
+      //record the purchase in ConvertKit
+      //console.log('Recording purchase in ConvertKit for order:', newOrder);
       await recordPurchase(newOrder);
     } catch (error) {
       console.error('Error recording purchase in ConvertKit:', error);
