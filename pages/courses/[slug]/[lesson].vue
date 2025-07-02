@@ -214,7 +214,7 @@ const route = useRoute();
 const { slug, lesson: lessonSlug } = route.params;
 
 // Get auth state
-const { user, authorizations } = useFirebaseAuth();
+const { user, authorizations, subscription } = useFirebaseAuth();
 
 // Import Vue utilities
 import { watchEffect } from "vue";
@@ -250,6 +250,11 @@ const lesson = computed(() => {
 });
 
 const isAuthorized = computed(() => {
+
+  if (subscription.value) {
+    return subscription.value.active;
+  }
+
   // Check if the user is authorized for the course
   return (
     user.value &&
