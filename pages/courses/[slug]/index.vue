@@ -245,6 +245,14 @@ const { data: course } = await useAsyncData(`course-${slug}`, () => {
   return queryCollection("courses").where("slug", "=", slug).first();
 });
 
+// 🚫 Return 404 if course is not found
+if (!course.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Course Not Found'
+  });
+}
+
 // Check if the course is free
 const isFree = computed(() => {
   return course.value?.access === "Free";

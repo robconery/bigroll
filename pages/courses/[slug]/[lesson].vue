@@ -239,6 +239,14 @@ const { data: course } = await useAsyncData(`course-${slug}`, () => {
   return queryCollection("courses").where("slug", "==", slug).first();
 });
 
+// 🚫 Return 404 if course is not found
+if (!course.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Course Not Found'
+  });
+}
+
 // Fetch all lessons for this course
 const { data: lessons } = await useAsyncData(`lessons-${slug}`, () => {
   return queryCollection("lessons").where("course", "==", slug).all();
@@ -248,6 +256,14 @@ const { data: lessons } = await useAsyncData(`lessons-${slug}`, () => {
 const lesson = computed(() => {
   return lessons.value?.find((l) => l.slug === lessonSlug);
 });
+
+// 🚫 Return 404 if lesson is not found
+if (!lesson.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Lesson Not Found'
+  });
+}
 
 const isAuthorized = computed(() => {
 
