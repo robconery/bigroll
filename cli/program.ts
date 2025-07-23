@@ -1,6 +1,7 @@
 //set up the default program
 import "dotenv/config";
 import { Order, Authorization, User, Subscription, Offer } from "../server/models/";
+import { DB } from "../server/lib/firefly";
 import { formatDate, header, keyValue, divider, formatStatus } from "./util";
 import { program } from "commander";
 import chalk from "chalk";
@@ -30,6 +31,69 @@ program.command("offers")
       }
     } catch (error) {
       console.error("Error fetching offers:", error);
+    }
+  });
+
+//create a command to grant a subscription to a user
+program.command("subscription:yearly [email] [end]")
+  .description("Subscribe a user to a yearly plan")
+  .action(async (email, end) => {
+    try {
+      if (!email) {
+        console.log(chalk.red.bold('Error: email is required'));
+        return;
+      }
+      if(end){
+        
+        end = new Date(end); // Convert to seconds
+      }else{
+        //parse the end date from a string
+        //const endDate = Date.parse(end);
+        end = new Date(Date.now() + 31536000000);
+      }
+      const plan = "yearly";
+      const interval = "year";
+      // Check if the user already has an active subscription
+      const existingSubscription = await Subscription.find({ email: email.toLowerCase()});
+      if (existingSubscription) {
+        //bump the sub a year
+        DB.updateOne("subscriptions", email, {
+          current_period_start: new Date(),
+          current_period_end: end,
+          status: 'active',
+        });
+        
+        // existingSubscription.current_period_start = {seconds: Math.floor(Date.now() / 1000)};
+        // existingSubscription.current_period_end = end; // 1 year in seconds
+        // existingSubscription.status = 'active';
+        // await existingSubscription.save();
+        console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Subscription updated for ${email}`));
+        console.log(keyValue('  Start Date', formatDate(existingSubscription.current_period_start), 2));
+        console.log(keyValue('  End Date', formatDate(existingSubscription.current_period_end), 2));
+        return;
+      }
+      // Create a new subscription// 1 year in milliseconds
+      const subscription = await DB.updateOne("subscriptions", email,{
+        id: email.toLowerCase(),
+        email: email.toLowerCase(),
+        plan: plan,
+        date: new Date(),
+        interval: interval,
+        status: 'active',
+        current_period_start: new Date(),
+        current_period_end: end, // 1 year in milliseconds
+        stripe_sub_id: null, // Set if using Stripe
+        stripe_customer_id: null, // Set if using Stripe
+        store: "rob",
+      });
+      console.log(chalk.bold.green('➤ ') + chalk.bold.white(`Subscription created for ${email}`));
+      console.log(keyValue('  Plan', plan, 2));
+      console.log(keyValue('  Interval', interval, 2));
+      console.log(keyValue('  Start Date', formatDate(new Date()), 2));
+      console.log(keyValue('  End Date', formatDate(end), 2));
+      console.log(divider());
+    } catch (error) {
+      console.error("Error subscribing user:", error);
     }
   });
 
@@ -91,6 +155,7 @@ program.command("order:create [email] [number] [slug] [total]")
       console.error("Error creating order:", error);
     }
   });
+
 program.command("order:authorize [number]")
   .description("Create a new order")
   .action(async (number) => {
@@ -345,6 +410,152 @@ program.command("send-downloads [email]")
 
     } catch (error) {
       console.error("Error sending downloads:", error);
+    }
+  });
+
+program.command("reports:monthly [month] [year]")
+  .description("📊 Show monthly sales report with offer rollup and totals")
+  .action(async (month, year) => {
+    try {
+      const now = new Date();
+      const targetMonth = month ? parseInt(month) : (now.getMonth() + 1); // 1-based month
+      const targetYear = year ? parseInt(year) : now.getFullYear();
+      
+      if (targetMonth < 1 || targetMonth > 12) {
+        console.log(chalk.red.bold('Error: Month must be between 1 and 12'));
+        return;
+      }
+      
+      // Create date range for the month
+      const startDate = new Date(targetYear, targetMonth - 1, 1); // Start of month
+      const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999); // End of month
+      
+      console.log(header(`Monthly Sales Report - ${startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`));
+      console.log(keyValue('Period', `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 0));
+      console.log(divider());
+      
+      // Fetch only orders within the date range using Firestore queries
+      const monthlyOrders = await DB.whereAnd("orders", [
+        { key: "date", op: ">=", val: startDate.toISOString() },
+        { key: "date", op: "<=", val: endDate.toISOString() }
+      ]);
+      
+      if (monthlyOrders.length === 0) {
+        console.log(chalk.italic('No orders found for this month'));
+        return;
+      }
+      
+      // Create offer rollup
+      const offerRollup = new Map();
+      let grandTotal = 0;
+      
+      for (const order of monthlyOrders) {
+        const slug = order.slug || 'Unknown Offer';
+        const total = order.total || 0;
+        
+        if (offerRollup.has(slug)) {
+          const existing = offerRollup.get(slug);
+          existing.count += 1;
+          existing.total += total;
+        } else {
+          offerRollup.set(slug, {
+            count: 1,
+            total: total
+          });
+        }
+        
+        grandTotal += total;
+      }
+      
+      // Display rollup
+      console.log(chalk.bold.cyan('📈 Offer Summary:'));
+      console.log('');
+      
+      // Sort by total revenue (highest first)
+      const sortedOffers = Array.from(offerRollup.entries()).sort((a, b) => b[1].total - a[1].total);
+      
+      for (const [slug, data] of sortedOffers) {
+        console.log(chalk.bold.blue(`${data.count} x 💰: ${chalk.bold.white(slug)} - $${data.total.toFixed(2)} `));
+      }
+      
+      console.log(divider());
+      console.log(chalk.bold.green('📊 Monthly Totals:'));
+      console.log(keyValue('  Total Orders', monthlyOrders.length.toString(), 2));
+      console.log(keyValue('  Total Revenue', `$${grandTotal.toFixed(2)}`, 2));
+      console.log(keyValue('  Unique Offers', offerRollup.size.toString(), 2));
+      console.log(divider());
+      
+    } catch (error) {
+      console.error("Error generating monthly report:", error);
+    }
+  });
+
+program.command("reports:orders [month] [year]")
+  .description("📋 List all orders for a specific month with details")
+  .action(async (month, year) => {
+    try {
+      const now = new Date();
+      const targetMonth = month ? parseInt(month) : (now.getMonth() + 1); // 1-based month
+      const targetYear = year ? parseInt(year) : now.getFullYear();
+      
+      if (targetMonth < 1 || targetMonth > 12) {
+        console.log(chalk.red.bold('Error: Month must be between 1 and 12'));
+        return;
+      }
+      
+      // Create date range for the month
+      const startDate = new Date(targetYear, targetMonth - 1, 1); // Start of month
+      const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999); // End of month
+      
+      console.log(header(`Orders List - ${startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`));
+      console.log(keyValue('Period', `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 0));
+      console.log(divider());
+      
+      // Fetch only orders within the date range using Firestore queries
+      const monthlyOrders = await DB.whereAnd("orders", [
+        { key: "date", op: ">=", val: startDate.toISOString() },
+        { key: "date", op: "<=", val: endDate.toISOString() }
+      ]);
+      
+      if (monthlyOrders.length === 0) {
+        console.log(chalk.italic('No orders found for this month'));
+        return;
+      }
+      
+      // Sort orders by date (newest first)
+      monthlyOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      console.log(chalk.bold.cyan(`📋 Found ${monthlyOrders.length} orders:`));
+      console.log('');
+      
+      // Display table header
+      console.log(chalk.bold.white('Order #'.padEnd(12)) + 
+                  chalk.bold.white('Email'.padEnd(30)) + 
+                  chalk.bold.white('Offer'.padEnd(20)) + 
+                  chalk.bold.white('Amount'.padEnd(12)) + 
+                  chalk.bold.white('Date'));
+      console.log('─'.repeat(12) + '─'.repeat(30) + '─'.repeat(20) + '─'.repeat(12) + '─'.repeat(12));
+      
+      // Display orders in table format
+      for (const order of monthlyOrders) {
+        const orderNum = (order.number || order.id || 'N/A').toString().substring(0, 11).padEnd(12);
+        const email = (order.email || 'N/A').substring(0, 29).padEnd(30);
+        const slug = (order.slug || 'N/A').substring(0, 19).padEnd(20);
+        const amount = order.total ? `$${order.total.toFixed(2)}`.padEnd(12) : 'N/A'.padEnd(12);
+        const date = formatDate(order.date).substring(0, 11);
+        
+        console.log(chalk.yellow(orderNum) + 
+                    chalk.white(email) + 
+                    chalk.cyan(slug) + 
+                    chalk.green(amount) + 
+                    chalk.gray(date));
+      }
+      
+      console.log('');
+      console.log(divider());
+      
+    } catch (error) {
+      console.error("Error listing orders:", error);
     }
   });
 

@@ -235,7 +235,7 @@ const route = useRoute();
 const { slug } = route.params;
 
 // Get the current user and auth store
-const { user, authorizations } = useFirebaseAuth();
+const { user, authorizations, subscription } = useFirebaseAuth();
 
 // Check if user is logged in
 const isLoggedIn = computed(() => !!user.value);
@@ -255,6 +255,10 @@ const hasAccess = computed(() => {
   // If course is free, everyone has access
   if (isFree.value) return true;
 
+  //if they're a subscriber, they have access
+  if (subscription.value) {
+    return subscription.value.active;
+  }
   // Otherwise, user needs to be authenticated and authorized for this course
   return (
     user.value &&

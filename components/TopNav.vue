@@ -38,8 +38,11 @@
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
               <li class="nav-item">
                 <NuxtLink class="nav-link" to="/downloads"
-                  >Find Your Downloads</NuxtLink
+                  >Downloads</NuxtLink
                 >
+              </li>
+              <li class="nav-item">
+                <NuxtLink class="nav-link" to="/courses">Courses</NuxtLink>
               </li>
               <li class="nav-item">
                 <NuxtLink class="nav-link" to="/posts">Posts</NuxtLink>

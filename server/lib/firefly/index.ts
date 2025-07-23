@@ -17,6 +17,8 @@ const formattedTableName = (className: string): string => {
   return Inflector.pluralize(underscored);
 };
 
+export const DB = db;
+
 export class Firefly<T extends Firefly<T>> {
   id!: string; // Using the non-null assertion operator to fix initialization error
   created_at!: string;
