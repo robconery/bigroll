@@ -151,14 +151,7 @@
         </div>
 
         <!-- Courses section -->
-        <div class="row g-4 mt-4" v-if="subscription && subscription.active">
-          <h2>Courses</h2>
-          <p>
-            You're a subscriber and you can watch anything you like! 
-            <NuxtLink to="/courses">Go have a look</NuxtLink>
-          </p>
-        </div> 
-        <div class="row g-4 mt-4" v-else>
+        <div class="row g-4 mt-4">
           <h2>Your Courses</h2>
           <div v-for="course in courses" :key="course.id" class="col-sm-6">
             <CourseCard :course="course" />

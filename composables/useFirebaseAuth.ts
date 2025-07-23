@@ -74,12 +74,9 @@ export const useFirebaseAuth = () => {
             const fetchedSubscription = await getSubscriptionByEmail(firebaseUser.email);
             if (fetchedSubscription) {
               subscription.value = fetchedSubscription;
-              subscription.value.active = fetchedSubscription.current_period_end.seconds > Date.now() / 1000; // Check if subscription is active
             } else {
               subscription.value = null;
-              subscription.value.active = false; // No subscription found
             }
-            
           // } else {
           //   // Create a new user model if not found in Firestore
           //   userModel.value = {
