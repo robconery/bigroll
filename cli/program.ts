@@ -1,11 +1,11 @@
 //set up the default program
 import "dotenv/config";
-import { Order, Authorization, User, Subscription, Offer } from "../server/models/";
+import { Order, Authorization, User, Subscription, Offer, Product } from "../server/models/";
 import { DB } from "../server/lib/firefly";
 import { formatDate, header, keyValue, divider, formatStatus } from "./util";
 import { program } from "commander";
 import chalk from "chalk";
-import { sendEmailWithDownloads } from "~/server/lib/email";
+import { sendEmailWithDownloads, testEmailWithDownloads } from "~/server/lib/email";
 
 const thriveAPI = "https://thrivecart.com/api/external/";
  
@@ -111,8 +111,77 @@ program.command("order [number]")
         console.log(chalk.red.bold(`Error: Order with number ${number} not found`));
         return;
       }
-      console.log('Order Information:');
-      console.log(order._toFirestore());
+      
+      // Display order information
+      console.log(header(`Order ${order.number}`));
+      console.log(chalk.bold.yellow('🛒 ') + chalk.bold.white('Order Details'));
+      console.log(keyValue('  Email', order.email, 2));
+      console.log(keyValue('  Date', formatDate(order.date), 2));
+      console.log(keyValue('  Total', order.total ? `$${order.total}` : 'N/A', 2));
+      console.log(keyValue('  Store', order.store || 'N/A', 2));
+      console.log(divider());
+      
+      // Get offer information and show individual products
+      if (order.slug) {
+        const offer = await Offer.find({ slug: order.slug });
+        if (offer) {
+          console.log(chalk.bold.blue('📦 ') + chalk.bold.white('Offer Information'));
+          console.log(keyValue('  Name', offer.name, 2));
+          console.log(keyValue('  Slug', offer.slug, 2));
+          console.log(keyValue('  Price', `$${offer.price}`, 2));
+          console.log(divider());
+          
+          // 🔥 Fetch and show detailed product information for each deliverable
+          console.log(chalk.bold.green('📋 ') + chalk.bold.white(`Individual Products (${offer.deliverables.length})`));
+          if (offer.deliverables.length > 0) {
+            for (const sku of offer.deliverables) {
+              // Fetch the actual product record
+              const product = await Product.find({ sku: sku });
+              if (product) {
+                console.log(chalk.bold.cyan('  🎯 ') + chalk.bold.white(product.name || sku));
+                console.log(keyValue('    SKU', product.sku, 4));
+                if (product.description) console.log(keyValue('    Description', product.description, 4));
+                if (product.price) console.log(keyValue('    Price', `$${product.price}`, 4));
+                if (product.summary) console.log(keyValue('    Summary', product.summary, 4));
+                if (product.download) console.log(keyValue('    Download URL', product.download, 4));
+                console.log('');
+              } else {
+                console.log(chalk.bold.cyan('  • ') + chalk.bold.white(sku));
+                console.log(chalk.italic('    Product details not found'));
+                console.log('');
+              }
+            }
+          } else {
+            console.log(chalk.italic('  No deliverables found'));
+          }
+          console.log(divider());
+        } else {
+          console.log(chalk.bold.blue('📦 ') + chalk.bold.white('Product Information'));
+          console.log(keyValue('  Slug', order.slug, 2));
+          console.log(chalk.italic('  Offer details not found'));
+          console.log(divider());
+        }
+      } else {
+        console.log(chalk.bold.blue('📦 ') + chalk.bold.white('Product Information'));
+        console.log(chalk.italic('  No slug found for this order'));
+        console.log(divider());
+      }
+      
+      // Get authorizations for this email
+      const authorizations = await Authorization.filter({ email: order.email });
+      console.log(header(`Authorizations (${authorizations.length})`));
+      if (authorizations.length > 0) {
+        for (const auth of authorizations) {
+          console.log(chalk.bold.green('➤ ') + chalk.bold.white(auth.sku));
+          console.log(keyValue('  Date', formatDate(auth.date), 2));
+          console.log(keyValue('  Order', auth.order || 'N/A', 2));
+          console.log(keyValue('  Store', auth.store || 'N/A', 2));
+          console.log(divider());
+        }
+      } else {
+        console.log(chalk.italic('No authorizations found for this email'));
+      }
+      
     } catch (error) {
       console.error("Error fetching order information:", error);
     }
@@ -195,7 +264,7 @@ program.command("order:authorize [number]")
     }
   });
 
-program.command("grant [email] [slug]")
+program.command("order:grant [email] [slug]")
   .description("Grant a user an authorization for an offer")
   .action(async (email, slug) => {
     try {
@@ -338,7 +407,7 @@ program
   });
 
 
-program.command("change-email [emails] [newEmail]")
+program.command("email:change [emails] [newEmail]")
   .description("Change the email of a user")
   .action(async (emails, newEmail) => {
     try {
@@ -397,7 +466,7 @@ program.command("change-email [emails] [newEmail]")
     }
   });
 
-program.command("send-downloads [email]")
+program.command("email:downloads [email]")
   .description("Send download links to a user's email")
   .action(async (email) => {
     try {
@@ -412,6 +481,45 @@ program.command("send-downloads [email]")
       console.error("Error sending downloads:", error);
     }
   });
+
+program.command("email:test [email]")
+  .description("🧪 Test and preview download email content without sending")
+  .action(async (email) => {
+    try {
+      if (!email) {
+        console.log(chalk.red.bold('Error: Email is required'));
+        return;
+      }
+      
+      const testResult = await testEmailWithDownloads(email);
+      
+      console.log(header(`Email Test Preview for ${email}`));
+      console.log(chalk.bold.blue('📧 ') + chalk.bold.white('Email Details'));
+      console.log(keyValue('  From', testResult.emailContent.from, 2));
+      console.log(keyValue('  To', testResult.emailContent.to, 2));
+      console.log(keyValue('  Subject', testResult.emailContent.subject, 2));
+      console.log(keyValue('  Downloads Found', testResult.downloadCount.toString(), 2));
+      console.log(divider());
+      
+      if (testResult.downloads.length > 0) {
+        console.log(chalk.bold.green('📋 ') + chalk.bold.white('Download Items'));
+        for (const download of testResult.downloads) {
+          console.log(chalk.bold.cyan('  • ') + chalk.bold.white(download.sku));
+          console.log(keyValue('    Download', download.download || 'N/A', 4));
+        }
+        console.log(divider());
+      }
+      
+      console.log(chalk.bold.yellow('📄 ') + chalk.bold.white('HTML Content Preview'));
+      console.log(chalk.gray('────────────────────────────────────────'));
+      console.log(testResult.emailContent.html);
+      console.log(chalk.gray('────────────────────────────────────────'));
+      
+    } catch (error) {
+      console.error("Error testing email:", error);
+    }
+  });
+
 
 program.command("reports:monthly [month] [year]")
   .description("📊 Show monthly sales report with offer rollup and totals")
@@ -558,6 +666,7 @@ program.command("reports:orders [month] [year]")
       console.error("Error listing orders:", error);
     }
   });
+
 
 // Parse command line arguments
 program.parse(process.argv);

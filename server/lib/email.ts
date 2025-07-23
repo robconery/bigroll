@@ -17,14 +17,11 @@ const createTransporter = () => {
 }
 
 /**
- * Send email with download links to a user
+ * 📧 Generate download email content
  * @param email Email address of the recipient
- * @returns Information about the sent email
+ * @returns Email content object
  */
-export async function sendEmailWithDownloads(email: string) {
-  console.log(`Sending download links to ${email}`)
-  
-  const transporter = createTransporter()
+async function generateDownloadEmailContent(email: string) {
   const downloads = await Authorization.getByEmail(email)
   
   let downloadLinks = []
@@ -33,9 +30,8 @@ export async function sendEmailWithDownloads(email: string) {
     downloadLinks.push(`<li><a href="${link}">${d.download}</a></li>`)
   }
   const linkHtml = downloadLinks.join('\n')
-  //const linkHtml = "";
-  // Email content
-  const emailContent = {
+  
+  return {
     from: '"Big Machine" <rob@bigmachine.io>',
     to: email,
     subject: "Your Big Machine Downloads",
@@ -49,8 +45,21 @@ export async function sendEmailWithDownloads(email: string) {
       <p>If you have any questions, please don't hesitate to hit reply. I can usually get back to you within 24 hours..</p>
       <p>Thanks so much,</p>
       <p>Rob</p>
-    `
+    `,
+    downloads
   }
+}
+
+/**
+ * 📤 Send email with download links to a user
+ * @param email Email address of the recipient
+ * @returns Information about the sent email
+ */
+export async function sendEmailWithDownloads(email: string) {
+  console.log(`Sending download links to ${email}`)
+  
+  const transporter = createTransporter()
+  const { downloads, ...emailContent } = await generateDownloadEmailContent(email)
   
   const info = await transporter.sendMail(emailContent)
   console.log("Email sent:", info.messageId)
@@ -105,5 +114,22 @@ export async function sendThankYouEmail(data: OrderData): Promise<string> {
   } catch (error) {
     console.error('Error sending thank you email:', error)
     throw error
+  }
+}
+
+/**
+ * 🧪 Generate email content for testing without actually sending it
+ * @param email Email address of the recipient
+ * @returns Email content object for testing
+ */
+export async function testEmailWithDownloads(email: string) {
+  console.log(`Generating test email content for ${email}`)
+  
+  const { downloads, ...emailContent } = await generateDownloadEmailContent(email)
+  
+  return {
+    emailContent,
+    downloadCount: downloads.length,
+    downloads: downloads.map(d => ({ sku: d.sku, download: d.download }))
   }
 }

@@ -163,6 +163,9 @@ export class Order extends Firefly<Order> {
         order: orderNumber,
         offer: offer.slug,
       });
+      if(product.download) {
+        authorization.download = product.download;
+      }
       await authorization.save();
       authorizations.push(authorization);
     }
