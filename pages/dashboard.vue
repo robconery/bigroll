@@ -157,6 +157,18 @@
             You're a subscriber and you can watch anything you like! 
             <NuxtLink to="/courses">Go have a look</NuxtLink>
           </p>
+          <h2 class="my-4">Subscriber Downloads</h2>
+          <div
+            v-for="download in subscriberDownloads"
+            :key="download.id"
+            class="download-item"
+          >
+            <DownloadCard 
+              :download="download"
+              :is-generating-link="isGeneratingLink"
+              @generate-download-link="generateDownloadLink"
+            />
+          </div>
         </div> 
         <div class="row g-4 mt-4" v-else>
           <h2>Your Courses</h2>
@@ -173,38 +185,11 @@
             :key="download.id"
             class="download-item"
           >
-            <div class="card mb-3">
-              <div class="row g-0">
-                <div class="col-md-4">
-                  <img
-                    :src="download.image"
-                    class="img-fluid rounded-start"
-                    :alt="download.title"
-                  />
-                </div>
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ download.title }}</h5>
-                    <p class="card-text">{{ download.description }}</p>
-                    <button
-                      @click="generateDownloadLink(download)"
-                      class="btn btn-sm btn-outline-primary"
-                      :disabled="isGeneratingLink === download.id"
-                    >
-                      <span v-if="isGeneratingLink === download.id">
-                        <span
-                          class="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                        Generating link...
-                      </span>
-                      <span v-else>Download</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <DownloadCard 
+              :download="download"
+              :is-generating-link="isGeneratingLink"
+              @generate-download-link="generateDownloadLink"
+            />
           </div>
         </div>
       </div>
@@ -250,7 +235,28 @@ const isSubscriptionActive = computed(() => {
   }
   //return subscription.value.isActive();
 });
-
+const subscriberDownloads = ref([{
+  id: "imposters-handbook",
+  title: "The Imposter's Handbook",
+  description: "A CS Primer for self-taught developers.",
+  image: "/images/slides/imposter-second.jpg",
+  download: "The Imposters Handbook, Second Edition.zip",
+},
+{
+  id: "imposters-roadmap",
+  title: "The Imposter's Roadmap",
+  description: "Essential tools and skills for self-taught developers who want to grow their career.",
+  image: "/images/slides/imposter-roadmap.jpg",
+  download: "imposter_roadmap_100.zip",
+},
+{
+  id: "curious-moon",
+  title: "A Curious Moon",
+  description: "Learn data science using real data from the Cassini mission to Saturn.",
+  image: "/images/slides/curious-moon.jpg",
+  download: "A Curious Moon 1.1.zip",
+},
+])
 // Process authorizations to get downloads
 const downloads = computed(() => {
   if (!authorizations.value) return [];
