@@ -365,14 +365,14 @@ program
   });
 
 program
-  .command("thrive:latest (term)")
-  .action(async (term) => {
+  .command("thrive:latest")
+  .action(async () => {
     try {
       // Fetch the latest orders from ThriveCart
       let url = `${thriveAPI}transactions?page=1&perPage=25&query=&transactionType=any`;
-      if (term) {
-        url = `${thriveAPI}transactions?page=1&perPage=25&query=${term}&transactionType=any`;
-      }
+      // if (term) {
+      //   url = `${thriveAPI}transactions?page=1&perPage=25&query=${term}&transactionType=any`;
+      // }
       const response = await fetch(url, {
         method: "GET",
         headers: {
