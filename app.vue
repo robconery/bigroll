@@ -1,10 +1,13 @@
 <template>
   <div>
+
     <Analytics />
     <TopNav />
     <main class="position-relative py-8">
       <div class="container mx-auto w-2/3">
-        <!-- Alert placeholder -->
+        <div class="alert alert-info" role="alert">
+          👋🏻 Quite a few things will be changing soon! <a href="/site/changes-again">Read here on what this means for you.</a>
+        </div>
       </div>
       <NuxtPage />
     </main>
